@@ -18,6 +18,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     hardware_gpio
     hardware_adc
+    hardware_dma
 )
 
 pico_add_extra_outputs(${PROJECT_NAME})
