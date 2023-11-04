@@ -7,9 +7,10 @@
 // Sample a pin at an interval and print the result to the terminal
 // test cached
 
-#define INTERVAL 50
+#define INTERVAL 250
 #define CONVERT (3.3f / (1<<12))
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 900
+#define THRESHHOLD 3.0
 
 float buffer[BUFFER_SIZE];
 uint8_t count = 0;
@@ -23,36 +24,31 @@ int main() {
     adc_gpio_init(26);  // silkscreen label A0
     adc_select_input(0);
 
-    while (1) {
-        // Poll until the voltage drops below some threshhold
-        // A low voltage seems to be the start condition
-        uint16_t temp = adc_read();
+    // wait for a start condition, if voltage is not below 1V continue
+    while (adc_read()*CONVERT > THRESHHOLD);
 
-        if (temp*CONVERT < 3.0) {
-            buffer[count++] = temp*CONVERT;
+    while (1) {
+        // transaction has started: sample to fill the buffer
+        for (int i = 0; i < BUFFER_SIZE; i++) {
+            buffer[i] = adc_read()*CONVERT;
+            sleep_us(INTERVAL);
         }
 
-        // temp print statements just to look at the receiver output
+        // clear the terminal
         printf("\033[1;1H\033[2J");
-        printf("ADC raw val %d\n", temp);
-        printf("ADC converted val %f V\n", temp*CONVERT);
+        
+        // print the buffer for serial plot
+        // for (int i = 0; i < BUFFER_SIZE; i++) printf("%d", buffer[i]);
 
-        // If buffer is full, print it, otherwise continue to fill it
-        if (count == BUFFER_SIZE) break;
-
-        sleep_ms(INTERVAL);
-    }
-
-    // Printf the buffer once it is full
-    while (1) {
-        printf("\033[1;1H\033[2J");
-        printf("\n{%f", buffer[0]);
-        for (int i = 1; i < count; i++) {
-            printf(", %f", buffer[i]);
-            if (i % 8 == 4) printf("\n");
+        // old print to be seen by a human
+        printf("{");
+        for (int i = 0; i < BUFFER_SIZE-1; i++) {
+            if (i % 10 == 0 && i != 0) printf("\n");
+            printf("%f, ", buffer[i]);
         }
-        printf("}\n");
-        sleep_ms(5000);
+        printf("%f}\n", buffer[BUFFER_SIZE-1]);
+
+        // wait for a new transaction to start
+        while(adc_read()*CONVERT > THRESHHOLD);
     }
-      
 }
