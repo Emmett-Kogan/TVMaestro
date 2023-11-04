@@ -16,6 +16,8 @@ target_sources(${PROJECT_NAME} PRIVATE ./src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib
+    hardware_gpio
+    hardware_adc
 )
 
 pico_add_extra_outputs(${PROJECT_NAME})
