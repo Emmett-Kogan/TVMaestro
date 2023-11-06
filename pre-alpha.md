@@ -26,5 +26,7 @@ There were several failed iterations of the ADC drivers before they worked prope
 
 ### Communication
 1. For now, the adafruit rp2040 feather is being used to interface with the TV remote that it will be replcaing in the calibration phase/mode, and then interfaceing with the TV and either a different MCU running the model discriminating between advertisements and broadcast footage, or the functionality in the rp2040 will need to be ported over to whatever other MCU we end up using (probably a beaglebone). Either way, ADCs are common peripherals, we will already have a good enough DAC breakout board by then for prototyping, and the same IR emitters/receivers will be sufficient.
+2. The Bluetooth communication will be done using android.bluetooth package. This package includes many useful APIs that essentially will allow us to create a Bluetooth socket where we can exhcange data with the paired hardware unit.
 
 ### Integrity and Resilience
+As we are still in the early stages of development, ensuring functionality of each portion of the project is the focus point. In the future when we have the functionality working as intended and start merging the portions together for full functionality we will be able to better address these concerns. As for now, there will be little concern for security or data issues as all important computation will be happening through wire or pcb connection. As for the Bluetooth connection to the app, with proper implementation and checks, these signals will not cause any improper transmissions.
