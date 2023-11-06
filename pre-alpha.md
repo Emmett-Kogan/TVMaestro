@@ -33,3 +33,6 @@ There were several failed iterations of the ADC drivers before they worked prope
 
 ### Integrity and Resilience
 During these initial stages of development, our primary objective is to ensure the seamless functionality of each individual component within the project. As we progress, and the intended functionality of each component is realized, we will proceed to integrate these parts to achieve comprehensive functionality. At this point, we anticipate minimal concerns related to security or data integrity, as all critical computations will be confined to wired or PCB connections. Concerning the Bluetooth connection to the accompanying app, proper implementation and checks should prevent any faulty or unintended transmissions from occuring.
+
+### Video Link
+https://youtu.be/a73od8HFZC8
