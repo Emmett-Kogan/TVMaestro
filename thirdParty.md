@@ -1,5 +1,4 @@
 # Third Party Sources
-TVMaestro will be a programmable remote that can manage a schedule of shows/channels, and skip advertisements by detecting them and switching channels
 
 ### Internet Archive
 1. Dataset that was used for ads that will be used to train Ad detection model
