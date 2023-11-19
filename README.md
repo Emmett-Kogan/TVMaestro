@@ -8,4 +8,6 @@ TVMaestro will be a programmable remote that can manage a schedule of shows/chan
 4. Emmett Kogan
 
 ### Current Tasks:
-1. Finish Design Draft -- primarily documenting planned systems/schematics, put the final pdf in docs =
+1. Design Prototype - need to progress on git issues/main things to get done
+2. Desgin Presentation - need to consider how we will present our work and prepare these (towards the end of break)
+	Note: We can rehearse after the slides are completed but before the presentation 11/30
