@@ -12,13 +12,21 @@ add_executable(${PROJECT_NAME}
     ./src/main.cpp
 )
 
+add_library(signal ./libraries/signal.cpp)
+
+target_link_libraries(signal
+    pico_stdlib
+    hardware_gpio
+    hardware_adc  
+)
+
 target_sources(${PROJECT_NAME} PRIVATE ./src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     hardware_gpio
     hardware_adc
-    hardware_dma
+    signal
 )
 
 pico_add_extra_outputs(${PROJECT_NAME})
