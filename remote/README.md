@@ -1,12 +1,17 @@
 # Remote
+Currently the ADC portion of this is pretty much done as far as recording signals from the remote. For now it is simply recording the signal at 500ksps and saving it in a buffer, and then compressing that buffer into runs of high and low values to save space (about 20K*2 bytes vs 800 bytes). The compressed signal can be stored in signal structs that will later be used to reproduce the signals with the IR emitter. To prove that this actually works, below are a few screenshots of the signal from an oscilloscope, the signal being plotted in serial plot after being recorded, and the runs output of the signal:
 
-## Goal
-This part needs to essentially make a universal remote, that has a calibrate mode, and then a normal operation mode. The calibrate mode will effectivley be an IR receiver that records button presses that the user is instructed to do, which will be recorded and later used by the normal operation mode to interact with a TV. The normal operation mode will use a DAC to regurgitate these recorded transmissions with an IR emitter.
+### Signal as measured in waveforms
+![Signal as measured in waveforms](screenshots/signal_waveforms.JPG)
 
-## Progress
-So far, code for interacting with the rp2040's ADCs has been written and tested while interfacing with a TSOP4838 to record signals from a Roku stick. Typically, these signals need to be sampled at 38 kHz, so while a POC has been written in earlier commits, a version using the DMA to properly record a signal that can later be reused is in progress. The external DAC has also not arrived yet so interfacing with that hasn't been possible yet either (this component was ordered on Tuesday, 10/31 and was supposed to arrive by 11/3 but the UPS tracking information reports the package as being delayed).
+### Signal as measured by the RP2040
+![Signal as measured by the RP2040](screenshots/signal_sp.JPG)
 
-The current circuit layout is just a TSOP4838 with it's ground and Vcc pins hooked up to the adafruit rp2040 feather's ground and Vcc pins, and the output pin is connected to the ADC0 channel's GPIO pin (A0). Furthermore, a DAD board oscilloscope channel is connected to the data out of the ADC so that the signal can be observed in waveforms as well.
+### Signal runs compressed in the MCU
+![Signal runs compressed in the MCU](screenshots/runs.JPG)
 
-## Known Bugs
-The ADC is currently sampling too fast, so it needs to be properly configured to sample at 38kHz and not higher. I looked at the transmission with an oscilloscope and it took around 23ms, so with a sampling rate of 38kHz, around 900 samples need to be collected, so after a start condition collecting 1000 should be fine to reconstruct the signal later on.
+## TODO
+I still need to reproduce a signal using the DAC, and make it turn on/off my TV, and that is what I am working towards, but first I'm going to be refactoring the ADC code so that it saves the compressed data into structs, and make a button struct that can be used later by the DAC code. To be honest, I think one ADC and one DAC function to record and then emit the signal should be fine, and later when I port these to the final MCU it will simply be a matter of calling these functions in a sequence with certain buttons as per the schedule.
+
+## Known issues
+The ADC probably does need to sample as fast as it is now, so I'll experiment with reducing the sampling rate once I get the transmissions working, and back down the sampling frequency until it barely works to save as much memory as possible, as this segment of the project is hardly the one that will be using the most.
