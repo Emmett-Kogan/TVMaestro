@@ -12,21 +12,12 @@ void signal_init(void) {
     // I'd like to configure this for fast mode plus I guess?
     // Will keep it in standard mode for now
 
-    // i2c_init(i2c_default, 100*1000);
-    // gpio_set_function(SDA, GPIO_FUNC_I2C);
-    // gpio_set_function(SCL, GPIO_FUNC_I2C);
-    // gpio_pull_up(SDA);
-    // gpio_pull_up(SCL);
-    gpio_init(SDA);
-    gpio_init(SCL);
-    gpio_set_dir(SDA, GPIO_OUT);
-    gpio_set_dir(SCL, GPIO_OUT);
+    i2c_init(i2c_default, 100*1000);
+    gpio_set_function(SDA, GPIO_FUNC_I2C);
+    gpio_set_function(SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(SDA);
+    gpio_pull_up(SCL);
 
-    gpio_put(SCL, 1);
-
-
-
-    while(1);
     // DAC init
     // just make it output a test voltage
     // note that last 4 bits are don't cares
@@ -36,8 +27,8 @@ void signal_init(void) {
     uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, 0x00, 0x00};
     while(1) {
         printf("again\n");
-        // i2c_write_blocking(i2c_default, MCP4725_ADDR, transmission, 3, true);
-        // sleep_ms(500);
+        i2c_write_blocking(i2c_default, MCP4725_ADDR, transmission, 3, true);
+        sleep_ms(500);
     }
     return;
 }
