@@ -17,7 +17,8 @@ add_library(signal ./libraries/signal.cpp)
 target_link_libraries(signal
     pico_stdlib
     hardware_gpio
-    hardware_adc  
+    hardware_adc
+    hardware_i2c
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ./src/main.cpp)
@@ -26,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     hardware_gpio
     hardware_adc
+    hardware_i2c
     signal
 )
 
