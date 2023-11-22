@@ -3,16 +3,16 @@
 // Initializes ADC, I2C and external DAC
 void signal_init(void) {
     // ADC init
-    adc_init();
-    adc_gpio_init(A0);  // silkscreen label A0
-    adc_select_input(0);
+    // adc_init();
+    // adc_gpio_init(A0);  // silkscreen label A0
+    // adc_select_input(0);
 
     // I2C init
 
     // I'd like to configure this for fast mode plus I guess?
     // Will keep it in standard mode for now
 
-    i2c_init(i2c_default, 100*1000);
+    i2c_init(i2c1, 400*1000);
     gpio_set_function(SDA, GPIO_FUNC_I2C);
     gpio_set_function(SCL, GPIO_FUNC_I2C);
     gpio_pull_up(SDA);
@@ -21,14 +21,9 @@ void signal_init(void) {
     // DAC init
     // just make it output a test voltage
     // note that last 4 bits are don't cares
-    sleep_ms(5000);
-    printf("Starting I2C transaction\n");
-
-    uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, 0x00, 0x00};
+    uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, 0xFF, 0xFF};
     while(1) {
-        printf("again\n");
-        i2c_write_blocking(i2c_default, MCP4725_ADDR, transmission, 3, true);
-        sleep_ms(500);
+        i2c_write_blocking(i2c1, MCP4725_ADDR, transmission, 3, false);
     }
     return;
 }
