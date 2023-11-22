@@ -62,12 +62,8 @@ void print_signal(button_t *button) {
 }
 
 void play_signal(button_t *button) {
-    uint8_t i, j;
-    
-    printf("last = %d\n", button->last);
-
     // For each run value and length, write the value and wait for the duration
-    for (i = 0; i < button->last; i+=2) {
+    for (uint8_t i = 0; i < button->last; i+=2) {
         DAC_write(button->signal[i] ? 0x0FFF : 0x000);
         sleep_us(button->signal[i+1]*4);
     }

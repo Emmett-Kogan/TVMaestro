@@ -19,6 +19,11 @@
 #define SDA     0x02
 #define SCL     0x03
 
+/*
+    Note that if a button isn't valid, last will always be 0, so there
+    is no need for another valid flag
+*/
+
 typedef struct button_t {
     uint32_t ID;                    // Button ID, see button enum
     uint32_t signal[SIGNAL_SIZE];  // store the compressed signal
