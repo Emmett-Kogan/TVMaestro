@@ -23,6 +23,8 @@ int main() {
         // Prints the signal over UART
         print_signal(&buttons[0]);
 
+        play_signal(&buttons[0]);
+
         // Wait so we don't accidentally record twice (seems like for the ROKU
         //  stick there is a button up and button down signal for instance)
         sleep_ms(5000);

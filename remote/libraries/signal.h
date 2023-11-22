@@ -30,12 +30,18 @@ enum {
     POWER = 0
 };
 
+// Initializes the necessary IO
 void signal_init(void);
 
+// Waits for a signal to start and then saves it to a buffer, then compresses
+// the information in the buffer and stores that into the signal array
 void record_signal(button_t *button);
+
+// Prints the signal array to the terminal
 void print_signal(button_t *button);
 
-// might just switch this to a pointer 
-// to the compressed signal instead of to the button
+// Uses the DAC to play the signal
 void play_signal(button_t *button);
+
+// Helper DAC function
 void DAC_write(uint16_t v);

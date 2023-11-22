@@ -3,31 +3,20 @@
 // Initializes ADC, I2C and external DAC
 void signal_init(void) {
     // ADC init
-    // adc_init();
-    // adc_gpio_init(A0);  // silkscreen label A0
-    // adc_select_input(0);
+    adc_init();
+    adc_gpio_init(A0);  // silkscreen label A0
+    adc_select_input(0);
 
     // I2C init
-
-    // I'd like to configure this for fast mode plus I guess?
-    // Will keep it in standard mode for now
-
-    i2c_init(i2c1, 400*1000);
+    i2c_init(i2c1, 1000*1000); 
     gpio_set_function(SDA, GPIO_FUNC_I2C);
     gpio_set_function(SCL, GPIO_FUNC_I2C);
     gpio_pull_up(SDA);
     gpio_pull_up(SCL);
-
-    // Example DAC triangle wave
-    uint16_t v = 0;
-    uint8_t flag = 0;
-    while(1) {
-        DAC_write(v);
-        v = flag ? v-10 : v+10;
-        if (v == 200 || v == 0) flag ^= 1;
-        sleep_ms(5);
-    }
     
+    // DAC init
+    DAC_write(0x0FFF);
+
     return;
 }
 
@@ -68,14 +57,20 @@ void record_signal(button_t *button) {
 
 void print_signal(button_t *button) {
     for (int i = 0; i < button->last; i+=2)
-        printf("%d: val %d, length %d\n", i/2, button->signal[i], button->signal[i+1]);
+        printf("%d: val %d, length %d\n", i/2, button->signal[i], 
+                                               button->signal[i+1]);
 }
 
 void play_signal(button_t *button) {
-    // Do I2C writs to the DAC with shifted ADC values, so that it outputs 3.3V
-    // while high and 0V when low for the signal, should only rewrite the thing
-    // when it changes, so there should be some wait logic that uses the run
-    // length value to determine how long to wait while high or low
+    uint8_t i, j;
+    
+    printf("last = %d\n", button->last);
+
+    // For each run value and length, write the value and wait for the duration
+    for (i = 0; i < button->last; i+=2) {
+        DAC_write(button->signal[i] ? 0x0FFF : 0x000);
+        sleep_us(button->signal[i+1]*4);
+    }
 }
 
 void DAC_write(uint16_t v) {
