@@ -38,3 +38,4 @@ void print_signal(button_t *button);
 // might just switch this to a pointer 
 // to the compressed signal instead of to the button
 void play_signal(button_t *button);
+void DAC_write(uint16_t v);

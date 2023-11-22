@@ -18,13 +18,16 @@ void signal_init(void) {
     gpio_pull_up(SDA);
     gpio_pull_up(SCL);
 
-    // DAC init
-    // just make it output a test voltage
-    // note that last 4 bits are don't cares
-    uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, 0xFF, 0xFF};
+    // Example DAC triangle wave
+    uint16_t v = 0;
+    uint8_t flag = 0;
     while(1) {
-        i2c_write_blocking(i2c1, MCP4725_ADDR, transmission, 3, false);
+        DAC_write(v);
+        v = flag ? v-10 : v+10;
+        if (v == 200 || v == 0) flag ^= 1;
+        sleep_ms(5);
     }
+    
     return;
 }
 
@@ -73,4 +76,9 @@ void play_signal(button_t *button) {
     // while high and 0V when low for the signal, should only rewrite the thing
     // when it changes, so there should be some wait logic that uses the run
     // length value to determine how long to wait while high or low
+}
+
+void DAC_write(uint16_t v) {
+    uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, (uint8_t) (v & 0xFF00 >> 8), (uint8_t) (v & 0x00FF)};
+    i2c_write_blocking(i2c1, MCP4725_ADDR, transmission, 3, false);
 }
