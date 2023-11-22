@@ -7,6 +7,9 @@ TVMaestro will be a programmable remote that can manage a schedule of shows/chan
 3. Matthew Darrow
 4. Emmett Kogan
 
+### Prototype Completed Work:
+1. Designed, and implemented a universal remote to facilitate IR communications between TVMaestro and the target TV as well as developed an interace to calibrate the remote to a TV's remote, and then replay those signals back to the TV.
+
 ### Current Tasks:
 1. Design Prototype - need to progress on git issues/main things to get done
 2. Desgin Presentation - need to consider how we will present our work and prepare these (towards the end of break)
