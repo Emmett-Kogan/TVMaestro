@@ -32,7 +32,7 @@ To prove that this actually works, below are a few screenshots of the signal fro
 ![Signal runs compressed in the MCU](screenshots/runs.JPG)
 
 ## TODO
-I still need to reproduce a signal using the DAC, and make it turn on/off my TV, and that is what I am working towards, but first I'm going to be refactoring the ADC code so that it saves the compressed data into structs, and make a button struct that can be used later by the DAC code. To be honest, I think one ADC and one DAC function to record and then emit the signal should be fine, and later when I port these to the final MCU it will simply be a matter of calling these functions in a sequence with certain buttons as per the schedule.
+Working on fixing bugs as far as the consistency of the remote, further, I will be speaking with Blake about how he wants to do commands to the remote module, and possibly change how they are currently done. For now it is just over serial from a laptop but ultimatley an app talking to a different MCU over bluetooth will likely need to talk to this module for calibration and then a seperate thread of execution may need to invoke this module when running schedules.
 
 ## Known issues
 I think the ADC needs to sample more often so that there is a better resolution for recording signals, so that replaying them works more consistently. It seems that some receivers are more forgiving than others.
