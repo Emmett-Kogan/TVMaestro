@@ -31,6 +31,9 @@ To prove that this actually works, below are a few screenshots of the signal fro
 ### Signal runs compressed in the MCU
 ![Signal runs compressed in the MCU](screenshots/runs.JPG)
 
+### Comparison of regenerated and original signals
+![](screenshots/original-vs-recreated.JPG)
+
 ## TODO
 Working on fixing bugs as far as the consistency of the remote, further, I will be speaking with Blake about how he wants to do commands to the remote module, and possibly change how they are currently done. For now it is just over serial from a laptop but ultimatley an app talking to a different MCU over bluetooth will likely need to talk to this module for calibration and then a seperate thread of execution may need to invoke this module when running schedules.
 
