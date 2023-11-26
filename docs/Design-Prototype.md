@@ -12,6 +12,7 @@ The timesheet's of each member are located [here](https://docs.google.com/spread
 ### Presentation
 ### Perception
 ### Usability
+The remote module of the prototype behaves predictably, as during normal operation, the user can use the commands record or play followed by a button ID to either trigger calibrating a button or playing back the signal with no randomness.
 
 ## Internal Systems
 ### Componenet Architectures
