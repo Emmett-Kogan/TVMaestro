@@ -3,6 +3,9 @@
 ## Time Breakdown
 The timesheet's of each member are located [here](https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0) and reflect on the time spent on research, and developing interfaces and systems throughout the milestone.
 
+## Building and Running
+Remote Module: See the README file in the remote directory for documentation on components required, construction of the circuits, and how to build and run the firmware.
+
 ## Evidence of Soundness
 ### Theoretical Background
 ### Prior Art
