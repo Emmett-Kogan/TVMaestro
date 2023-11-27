@@ -9,12 +9,15 @@ Remote Module: See the README file in the remote directory for documentation on 
 ## Evidence of Soundness
 ### Theoretical Background
 ### Prior Art
-### Empirical Evidence
-
 ## External Interfaces
 ### Presentation
+The external interface for the TVMaestro consists of a remote and a companion android application. The remote module is a tactile interface as it includes buttons for programming options. The app is a graphical interface that allows users to view bluetooth pairing/connectivity options, as well as schedule options and the current state of these options. 
+
 ### Perception
+Feedback from the TVMaestro will be given through the application. The app visually will change based on what the user interacts with. For instance, upon opening the application a user is prompted to connect to their TVMaestro via bluetooth. Once this connection is established the app shows a connected message and allows the user to begin assigning schedules on the schedule page.
+
 ### Usability
+The prototype companion app acts as expected, as it shows that the user should connect to a TVMaestro to begin scheduling. Additionally, the scheduling page allows for selection/creation of schedules. None of these exhibit random behavior through testing.
 The remote module of the prototype behaves predictably, as during normal operation, the user can use the commands record or play followed by a button ID to either trigger calibrating a button or playing back the signal with no randomness.
 
 ## Internal Systems
