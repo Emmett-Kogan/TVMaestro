@@ -9,6 +9,8 @@ TVMaestro will be a programmable remote that can manage a schedule of shows/chan
 
 ### Prototype Completed Work:
 1. Designed, and implemented a universal remote to facilitate IR communications between TVMaestro and the target TV as well as developed an interace to calibrate the remote to a TV's remote, and then replay those signals back to the TV.
+2. Accomplished building and deploying a tv-commercial detection model on the collected dataset.
+![tv-commercial detection](https://raw.githubusercontent.com/Emmett-Kogan/TVMaestro/master/tvCommercialDetection.png "tv-commercial detection")
 
 ### Current Tasks:
 1. Design Prototype - need to progress on git issues/main things to get done
