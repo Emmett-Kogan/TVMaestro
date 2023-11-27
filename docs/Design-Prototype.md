@@ -5,6 +5,7 @@ The timesheet's of each member are located [here](https://docs.google.com/spread
 
 ## Building and Running
 Remote Module: See the README file in the remote directory for documentation on components required, construction of the circuits, and how to build and run the firmware.
+Companion App: Locate the README file in the CompanionApp directory for information on how to build and run the app.
 
 ## Evidence of Soundness
 ### Theoretical Background
@@ -22,7 +23,7 @@ The remote module of the prototype behaves predictably, as during normal operati
 
 ## Internal Systems
 ### Componenet Architectures
-The architecture of the remote module is described in the directory's README.md, further, a schematic of the final circuit is also listed. In the building/running section, it outlines the method of running the code as well as lists the required circuit to run it properly. The companion application is a android app that is currently being run through Android Studio's native testing/simulation tools. The app can also be ran on a android device with developer options enabled.
+The architecture of the remote module is described in the directory's README.md, further, a schematic of the final circuit is also listed. In the building/running section, it outlines the method of running the code as well as lists the required circuit to run it properly. The companion application is a android app that is currently being run through Android Studio's native testing/simulation tools. The app can also be ran on a android device with developer options enabled. Instructions on how to run this are in the README.md of the CompanionApp directory.
 
 ### Communication Mechansims
 The TVMaestro will communicate with TV's via the remote module, which uses IR to issue commands to the TV just like any other remote. It first calibrates by acting as an IR receiver from the actual remote to get signals to retransmit when told to by other parts of the project (e.g. it receives a signal to change the channel from the ML model so it sends the requisite signals to change the channel to the next in line in the schedule). Once it is in scheudle mode it will actually use the recorded signals to modfiy the state of the TV. There will be internal communication to faciliate this, e.g. the ML model and app components will need to calibarate and issue commands to the remote module throughout operation. A demonstration of the remote module can be found in the remote/README.md, where a power on signal was recorded using an ADC, and regurgitated using the MCP4725 DAC, which is then shown with an oscope and fed into a diode that emits the message.
