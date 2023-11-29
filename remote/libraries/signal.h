@@ -15,7 +15,8 @@
 #define THRESHHOLD 2.0
 
 // Feather pins (silkscreen labels)
-#define A0      0x1A    
+#define A0      0x1A
+#define A2      0x1C    
 #define SDA     0x02
 #define SCL     0x03
 

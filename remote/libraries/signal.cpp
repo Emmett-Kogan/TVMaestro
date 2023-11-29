@@ -4,8 +4,8 @@
 void signal_init(void) {
     // ADC init
     adc_init();
-    adc_gpio_init(A0);  // silkscreen label A0
-    adc_select_input(0);
+    adc_gpio_init(A2);  // silkscreen label A0
+    adc_select_input(2);
 
     // I2C init
     i2c_init(i2c1, 1000*1000); 
