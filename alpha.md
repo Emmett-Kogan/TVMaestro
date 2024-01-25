@@ -7,32 +7,26 @@
 1. Repo with issues/commit history: https://github.com/Emmett-Kogan/TVMaestro
 2. Timesheet: https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
 
+## Usability
 
-## Architectural Elements
+### Interface
+### Navigation
+### Perception
+### Responsiveness
+
+## Build Quality
+
+### Robustness
+### Consistency
+### Aesthetic Rigor
+
+## Vertical Features
 
 ### External Interface
-![Local Image](./companionAppHome.png)
+The external interface of the remote module has been ported onto the Adafruit NRF52840 feather board. For now, it was implemented just using Arduino IDE and, should work exactly the same as it did in the previous implementation, however, it has not been exhaustivley tested yet. While the new implementation will eventually use a uSD card to store schedule information across power cycles, the driver for the nrf52840 still needs to be completed, as playing with bluetooth communication between a phone and the board was a higher priority for this sprint.
 
-For the external interface, we elected to begin developing portions of the mobile application, as the exact hardware we will be moving forward with has not been solidified. The mobile application has been implemented as an android app that will allow users to pair to their TVMaestro hardware unit and control it from there. Development has begun for the opening page where a user will pair to their TVMaestro, and the Schedule page where users will edit scheduling options. The app will communicate to the hardware unit that is running the persistent state through bluetooth. We are currently in the process of writing the bluetooth functionality.
 ### Persistent State
-Regarding persistent state, clearly preserving the button calibration across power cycles is ideal. In the DAC breakout board order, we also purchased a microSD board for a seperate project, however, it would also be useful for developing this one, as storing the transmission data onto that with a basic metadata structure with pointers and bounds related to each transmission's recording, as well as some identifying information on what button's it corresponds to should be sufficient for preserving the calibration. Furthermore, the same hardware could be used to preserve schedules locally on the embedded device so that user's do not need to use their phones/the extenral app to reconfigure their schedules/preferences on the device as well, just in a seperate memory segment. The bounds of each segment will be easiest to determine once we have a better idea of how many button transmissions we need to record, and the size of the data structure necessary to keep track of them, and, an firmer concept on how we will track and store schedules in the same address space.
+As far as the remote module, the major use case for persistent state would be storing schedule information. We have components to interface with a uSD card to accomplish this, but, during this sprint, we focused on getting bluetooth connection between the MCU and app over this, but, once we standardize how a scheudle will be stored, writing this externally and reading this upon reset should be trivial.
 
 ### Internal Systems
-1. The calibration mode feature requires the ability to record IR transmissions sent from the remote to the television. At this point, proof of concept code has been written that can record any transmission, however, the sampling rate needs to be properly configured so that the number of samples collected accuratley records the entire signal to be repeated in the regular operation mode. So the ADCs have been interfaced with, and functionality to handle sampling with a DMA channel.
-2. An internal buffer has been used to store the transmission sample raw data, that will later be used for a different dma transfer which will interface with the DAC and an IR emitter to then transmit the recorded transmission to replace the functionality provided by the remote.
-3. This functionality will be packaged in a library once it is functional.
-4. A dataset of about 80 advertisement videos from 2021-2023 was grabbed from Internet Archive. Non-ad footage will also need to be downloaded, and these videos will have to be broken into frames. These frames will be used to train our model to classify images as ads or not ads.
-
-There were several failed iterations of the ADC drivers before they worked properly, as well as a significant amount of experimentation and research that went into selecting the componenets used, understanding how to use them and their documentation that went into this work. This is why the current iteration is using a DMA channel it is easier to configure the sample frequency by adjusting just the sample rate of the ADC using a few defines isntead of rewriting delays and whatnot in a more complex loop.
-
-## Information Handling
-
-### Communication
-1. For now, the adafruit rp2040 feather is being used to interface with the TV remote that it will be replcaing in the calibration phase/mode, and then interfaceing with the TV and either a different MCU running the model discriminating between advertisements and broadcast footage, or the functionality in the rp2040 will need to be ported over to whatever other MCU we end up using (probably a beaglebone). Either way, ADCs are common peripherals, we will already have a good enough DAC breakout board by then for prototyping, and the same IR emitters/receivers will be sufficient.
-2. The Bluetooth communication will be done using android.bluetooth package. This package includes many useful APIs that essentially will allow us to create a Bluetooth socket where we can exhcange data with the paired hardware unit.
-
-### Integrity and Resilience
-During these initial stages of development, our primary objective is to ensure the seamless functionality of each individual component within the project. As we progress, and the intended functionality of each component is realized, we will proceed to integrate these parts to achieve comprehensive functionality. At this point, we anticipate minimal concerns related to security or data integrity, as all critical computations will be confined to wired or PCB connections. Concerning the Bluetooth connection to the accompanying app, proper implementation and checks should prevent any faulty or unintended transmissions from occuring.
-
-### Video Link
-https://youtu.be/a73od8HFZC8
+For the primary remote use case, the recording and replaying action is close to finished, where a stream of input data is being compressed and reproduced using an ADC and a GPIO pin (I took another look at the ADC input and since it was binary I just hooked up a GPIO pin to the emitter instead of using a DAC). Further, we've sent messages between the nrf52840 and Adafruit's Bluefruit, so the main work for getting bluetooth communication working before implementing each set of commands for the app and MCU is just getting the app to talk to the MCU the same way Bluefruit does.
