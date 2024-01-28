@@ -10,10 +10,13 @@
 ## Usability
 
 ### Interface
+In terms of the UI for the mobile application, a user can access available devices to pair to via BLE as well as the options for scheduling such as selecting channel schedules or enabling/disabling add detections.
 ### Navigation
+Current navigation through the mobile application is very intuitive. The two different activities (Home and Schedule) selectable on the bottom naviagtion bar allow users to quickly swap between setup and running options which are displayed to the user upon selection of the particular activity.
 ### Perception
+Changes within the mobile applications UI are indicated visually with either a popup window or by displaying the currently selected option. A currently selected option is located adjacent to its respective selection menu for clarity sake. 
 ### Responsiveness
-
+Currently the application is not having to wait for any responses, however in the future when this is implemented, these types of processes will be pushed to the forefront of currently occuring operations.
 ## Build Quality
 
 ### Robustness
