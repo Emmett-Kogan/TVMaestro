@@ -19,6 +19,7 @@ target_link_libraries(signal
     hardware_gpio
     hardware_adc
     hardware_i2c
+    pico_i2c_slave
 )
 
 target_sources(${PROJECT_NAME} PRIVATE ./src/main.cpp)
@@ -28,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
     hardware_gpio
     hardware_adc
     hardware_i2c
+    pico_i2c_slave
     signal
 )
 

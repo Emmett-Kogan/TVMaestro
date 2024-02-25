@@ -1,22 +1,15 @@
 #include "signal.h"
 
-// Initializes ADC, I2C and external DAC
+// Initializes ADC and GPIO
 void signal_init(void) {
     // ADC init
     adc_init();
-    adc_gpio_init(A2);  // silkscreen label A0
+    adc_gpio_init(A2);
     adc_select_input(2);
 
-    // I2C init
-    i2c_init(i2c1, 1000*1000); 
-    gpio_set_function(SDA, GPIO_FUNC_I2C);
-    gpio_set_function(SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(SDA);
-    gpio_pull_up(SCL);
-    
-    // DAC init
-    DAC_write(0x0FFF);
-
+    // GPIO init
+    gpio_init(SIGNAL_PIN);
+    gpio_set_dir(SIGNAL_PIN, GPIO_OUT);
     return;
 }
 
@@ -64,12 +57,7 @@ void print_signal(button_t *button) {
 void play_signal(button_t *button) {
     // For each run value and length, write the value and wait for the duration
     for (uint8_t i = 0; i < button->last; i+=2) {
-        DAC_write(button->signal[i] ? 0x0FFF : 0x000);
+        gpio_put(SIGNAL_PIN, button->signal[i] ? 1 : 0);
         sleep_us(button->signal[i+1]*4);
     }
-}
-
-void DAC_write(uint16_t v) {
-    uint8_t transmission[3] = {MCP4725_WRITE_COMMAND, (uint8_t) (v & 0xFF00 >> 8), (uint8_t) (v & 0x00FF)};
-    i2c_write_blocking(i2c1, MCP4725_ADDR, transmission, 3, false);
 }

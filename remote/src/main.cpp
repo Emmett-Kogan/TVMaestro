@@ -1,97 +1,149 @@
 #include "../libraries/signal.h"
+#include <vector>
 #include <stdlib.h>
+#include <pico/i2c_slave.h>
+#include "hardware/i2c.h"
+#include "hardware/gpio.h"
 
-#define MAX_BUTTONS 10
+#define MAX_BUTTONS 20
+#define USED_BUTTONS 12
+#define I2C_SLAVE_ADDRESS 0x42
+#define SDA     0x02
+#define SCL     0x03
+#define BTN_PIN 13
 
-#define CR  0x0D
-#define LF  0x0A
-#define BS  0x08
-#define DEL 0x7F
+// Buttons 0-9 will be the digits
+#define POWER 10
+#define VU 11
+#define VD 12
+// 13-19 will be reserved for furture use
+
+// Commands
+//     !record <button id>
+//     !play <button id>
+//     !display <button id>
+//     !identify
+    
+//     setup for:
+//     !calibrate
+//     !schedule <schedule>
+//     !vol <+/->
 
 static button_t buttons[MAX_BUTTONS];
+static uint8_t calibrared = 0;
+
+// Communbication variables for commands
+static char i2c_buffer[512];
+static size_t i2c_index = 0;
+static uint8_t i2c_flag = 0;
+
+// Flag for when told to change channels by ML MCU
+volatile uint8_t change_channel = 0;
+
+// Schedule
+std::vector<int> schedule;
+
+static void i2c_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
+    if (event == I2C_SLAVE_RECEIVE)
+        i2c_buffer[i2c_index++] = i2c_read_byte_raw(i2c);
+    else
+        i2c_flag = 1;
+}
+
+static void button_handler(uint gpio, uint32_t events) {
+    gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, false);
+    change_channel = 1;
+}
 
 int main() {
     // Init peripherals
     stdio_init_all();
+
+    // I2C init
+    gpio_set_function(SDA, GPIO_FUNC_I2C);
+    gpio_set_function(SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(SDA);
+    gpio_pull_up(SCL);
+    i2c_init(i2c1, 100000); 
+    i2c_slave_init(i2c1, I2C_SLAVE_ADDRESS, &i2c_handler);
+
+    // GPIO init
+    gpio_init(BTN_PIN);
+    gpio_set_dir(BTN_PIN, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(BTN_PIN, GPIO_IRQ_EDGE_RISE, true, &button_handler);
     
-    // Initializes peripherals for use by the signal library
+    // Init signal library
     signal_init();
 
-    buttons[0].ID = POWER;
-
     while(1) {
-        // Clear previous output
-        printf("\033[1;1H\033[2J");
-
-        // Record button press: waits until start condition so this is blocking
-        record_signal(&buttons[0]);
-
-        // Prints the signal over UART
-        print_signal(&buttons[0]);
-
-        play_signal(&buttons[0]);
-
-        // Wait so we don't accidentally record twice (seems like for the ROKU
-        //  stick there is a button up and button down signal for instance)
-        sleep_ms(5000);
-    }
-
-    while(1) {
-        // Clear previous output
-        printf("\033[1;1H\033[2J");
-
-        // Get command
-        char command[256];
-        uint8_t index = 0;
-        while(1) {
-            command[index] = getchar();
-            printf("%c", command[index]);
-
-            if ((command[index] == BS || command[index] == DEL) && index > 0) {
-                command[--index] = 0;
-            }
-            else if (command[index] == CR) {
-                command[++index] = 0;
-                printf("\n");
-                break;
-            }
-            else
-                index++;
+        while(!i2c_flag && !change_channel) {
+            sleep_ms(50); // I have no idea why but this makes a difference
         }
 
-        // Get thing to do the command on
-        index = 0;
-        while(command[index++] != ' ');
-        uint8_t button = atoi(&command[index]);
+        // Handle case for button press
+        if (change_channel) {
+            // Change the channel
+            printf("Changing channel\n");
+            
+            // Debaounce and cleanup
+            gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, true);
+            sleep_ms(100);
+            change_channel = 0;
+            continue;
+        }
 
-        // Parse commands
-        switch(command[0]) {
+        // Clear previous output
+        printf("\033[1;1H\033[2J");
+        for (int i = 0; i < i2c_index; i++)
+            printf("%c", i2c_buffer[i]);
+        
+        // Only when specifying button do we care about this
+        uint32_t index = 0, button;
+        if (i2c_buffer[1] == 'r' || i2c_buffer[1] == 'p' || i2c_buffer[1] == 'd') {
+            while (i2c_buffer[index++] != ' ');
+            button = atoi(&i2c_buffer[index]);
+            printf("Button specified: %d\n", button);
+        }
+
+        switch(i2c_buffer[1]) {
             case 'r':
-                printf("Recording signal for button %d\n", button);
                 record_signal(&buttons[button]);
+                printf("Button %d recorded\n", button);
                 break;
-
             case 'p':
-                if (!buttons[button].last) {
+                if (!buttons[button].last)
                     printf("Error: button signal has not been recorded");
-                    continue;
-                }
-
-                printf("Playing signal for button %d\n", button);
-                play_signal(&buttons[button]);
+                else
+                    play_signal(&buttons[button]);
                 break;
-
             case 'd':
-                printf("Displaying signal for button %d\n", button);
                 print_signal(&buttons[button]);
                 break;
-
-            default:
-                // do nothing
+            case 'i':
+                printf("This is a TVMaestro!\n");
+            case 'c':
+                // Will do a sequence of records
+                calibrared = 1;
                 break;
-            
+            case 's':
+                // Configure schedule variable
+                // Will take a space seperated list of channel numbers
+                // and push it to the schedule vector. Where the highest
+                // priority channel should be at index 0
+                break;
+            case 'v':
+                // Adjust volume
+                while(i2c_buffer[index++] != ' ');
+                if (calibrared)
+                    play_signal(&buttons[(i2c_buffer[index] == '+') ? VU : VD]);
+
+                break;
+            default:
+                printf("Error: Invalid command");
         }
 
-        sleep_ms(1000);
+        // Reset buffer index and flag so we wait for the interrupt to be triggered again
+        i2c_index = 0;
+        i2c_flag = 0;
     }
 }
