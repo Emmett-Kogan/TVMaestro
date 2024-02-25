@@ -17,10 +17,25 @@ The pico application is also pretty much done now as far as recording signals, r
 The layout and connections of the circuit are shown as follows, where only the necessary IO pins and connections are shown for this module: \
 ![Circuit](screenshots/circuit.JPG)
 
+Note that the I2C Dac is gone, and the NRF52840 is now the master of the I2C bus. Also note that the NRF52840 requires external pullup resistors for the I2C bus.
+
 ## Building/Running
-This assumes that the circuit has been constructed and the RP2040 has been connected to your computer. \
+This assumes that the circuit has been constructed and the RP2040 has been connected to your computer.  Furhter, this also assumes the same for the NRF52840 and that the ArduinoIDE [setup](https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/arduino-bsp-setup) guide has also been followed\
 To build the remote module, first clone the repository into a linux system (WSL works fine). You need to have cloned the pico-sdk somewhere else on your system as well. Export the path to the pico-sdk directory, e.g. `export PICO_SDK_PATH=~/pico/pico-sdk` so that cmake can generate the correct paths for dependencies. Change directories to the `TVMaestro/remote/build` directory or make it if it does not yet exist, then type `cmake ..` to generate the build scripts. Type `make` to build the project, note that this will generate a `remote.uf2` binary that we will now copy to the RP2040 board. You can set the feather to bootloader mode by holding reset and the 'BOOTSEL' button at the same time, and releasing the reset button first. A USB device should show up on your system and you can simply drag the .uf2 to the device. \
-To use the app there are two commands, `record` and `play` that you can send over a serial connection followed by a number identifier to record and playback signals of certain buttons, for instance, doing `record 0`, pointing a remote at the board and pressing the power button, then following this with `play 0` will replay the signal that was just recorded (the power button) and if aimed the corresponding TV, will turn it on or off.
+Furthermore, to build the BLE code and upload it to the NRF52840 feather, assuming the NRF52840 development guide with ArduinoIDE has been followed, you should simply be able to open the `controller` files in ArduinoIDE and compile/upload them to the board. I have found that this board has an error where sometimes when uploading to the board it will return some DFU error when updating the firmware. If this happens, simply put the board into the bootloader write mode by pressing the reset button twice quickly (if it is in bootloader mode, the neopixel LED will be green), update the COM port in the IDE to be the new NRF52840 port, and upload again.
+
+## Commands
+| Command | Arguements | Explanation |
+|-------------------------	|-------	|--------------	|
+| !record | button index | Overwrite the button signal |
+| !play | button index | Transmit the signal of the button |
+| !display | button index | Print internal representation of the button's signal |
+| !identify | N/A | Prints a string to USB |
+| !calibrate | N/A | Initiates a calibration sequence where the user must press 0-9, power, then volume up followed by volume down to record each of the buttons |
+| !schedule | schedule | Configure the module's schedule, where the scheudle is a space seperated list of channel numbers |
+| !vol | +/- | Adjust the volume by sending this command follwed by + or - to adjust up or down respectivley |
+
+To use the app, you can issue the commands listed above using a phone connected to the BLE board over bluetooth.
 
 ## Oscope screenshots of the module running
 To prove that this actually works, below are a few screenshots of the signal from an oscilloscope, the signal being plotted in serial plot after being recorded, and the runs output of the signal:
