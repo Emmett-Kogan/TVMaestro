@@ -1,5 +1,7 @@
 # Remote
-Currently the ADC portion of this is pretty much done as far as recording signals from the remote. For now it is simply recording the signal at 500ksps and saving it in a buffer, and then compressing that buffer into runs of high and low values to save space (about 20K*2 bytes vs 800 bytes). The compressed signal can be stored in signal structs that will later be used to reproduce the signals with the IR emitter. 
+The BLE portion is complete, where it advertises a bluetooth connection, and receives command strings over it. It forwards these command strings to the pico over I2C afterwards. This is the stage where a checksum, if necessary, will be implemented. Through testing so far, there haven't been issues with sending arbitrary amounts of data through this communication pipeline, however, I also haven't tested this for a variety of ranges/enough times to be able to say whether or not some form of error checking is necessary.
+
+The pico application is also pretty much done now as far as recording signals, receiving communications with both the ML MCU and BLE board, and most functionality has been implemted, i.e. the commands for calibrating specific buttons, replaying certain buttons, some quality of life commands that were added, and setup for a calibration command that steps through with the app to record all necessary buttons, as well as schedule configuration has been implemented. The signals are done the same way as before, however, the DAC has been optimized out as the signals are just high or low, there is no need to be able to write a range of voltages to the emmitter, so the latency involved with the DAC is now gone.
 
 ## Bill of materials
 | Componenet              	| Count 	| Sourced from 	| Notes                                                                                           	|
@@ -7,8 +9,9 @@ Currently the ADC portion of this is pretty much done as far as recording signal
 | TSOP4838                	| 1     	| Mouser       	|                                                                                                 	|
 | SIR-56ST3F              	| 1     	| Mouser       	|                                                                                                 	|
 | Adafruit Feather RP2040 	| 1     	| Adafruit     	| Any RP2040 will work, though the defines for each pin in the firmware will have to be modified and the Building/Running instructions assume this board. 	|
-| MCP4725 Breakout Board  	| 1     	| Adafruit     	|                                                                                                 	|
-| 1 $\mathsf{k\Omega}$ Resistor     	| 1     	| Any          	|                
+| Adafruit Feather NRF52840 |1      | Adafruit | The code related to this board was built using ArduinoIDE, so the libraries used specify this specefic board. |   	|
+| 1 $\mathsf{k\Omega}$ Resistor     	| 3     	| Any          	|    |            
+| Push button | 1    | Any | This was simply used to simulate communication from the ML MCU and is unnecessary in the final build |
 
 ## Construction of the circuit
 The layout and connections of the circuit are shown as follows, where only the necessary IO pins and connections are shown for this module: \
@@ -34,8 +37,6 @@ To prove that this actually works, below are a few screenshots of the signal fro
 ### Comparison of regenerated and original signals
 ![](screenshots/original-vs-recreated.JPG)
 
-## TODO
-Working on fixing bugs as far as the consistency of the remote, further, I will be speaking with Blake about how he wants to do commands to the remote module, and possibly change how they are currently done. For now it is just over serial from a laptop but ultimatley an app talking to a different MCU over bluetooth will likely need to talk to this module for calibration and then a seperate thread of execution may need to invoke this module when running schedules.
-
 ## Known issues
-I think the ADC needs to sample more often so that there is a better resolution for recording signals, so that replaying them works more consistently. It seems that some receivers are more forgiving than others.
+1. The ADC samples and toggling the GPIO pin are not synchronzied correctly when sending/receiving a signal. This causes a bit of variance that prevents the remote from working all of the time.
+2. The current button setup for simulating signals from the ML MCU is not being debounced properly so there are times where repeated change channel events occur. Currently the interrupt is just being disabled for 100ms, but, I haven't had a chance to look at how long the button bounces for. This should not be an issue moving forward as a GPIO pin sending the signal from the ML MCU should not bounce as severly (or at all). 
