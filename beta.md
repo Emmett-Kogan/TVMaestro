@@ -1,4 +1,4 @@
-# Alpha Build Report
+# Beta Build Report
 
 ### Repository Link
 1. https://github.com/Emmett-Kogan/TVMaestro
@@ -10,22 +10,27 @@
 ## Usability
 
 ### Interface
-In terms of the UI for the mobile application, a user can access available devices to pair to via BLE as well as the options for scheduling such as selecting channel schedules or enabling/disabling add detections.
-
+In terms of the UI for the mobile application, a user can access available devices to pair to via BLE as well as the options for scheduling such as selecting channel schedules or enabling/disabling add detections, as well as options for controlling the hardware unit. The hardware options will be added in the near future. Below is some screenshots from an android device running the application with some of the relevant UI pages.
+![Screenshot_20240225_203002_AndroidApp (1)](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/d455b137-35ef-4984-9da7-d94336fb88c1)
 ### Navigation
-Current navigation through the mobile application is very intuitive. The two different activities (Home and Schedule) selectable on the bottom naviagtion bar allow users to quickly swap between setup and running options which are displayed to the user upon selection of the particular activity.
+Current navigation through the mobile application is very intuitive. The two different activities (Home and Schedule) selectable on the bottom naviagtion bar allow users to quickly swap between setup and running options which are displayed to the user upon selection of the particular activity. This is depicted in the photo above.
 ### Perception
-Changes within the mobile applications UI are indicated visually with either a popup window or by displaying the currently selected option. A currently selected option is located adjacent to its respective selection menu for clarity sake. 
+Changes within the mobile applications UI are indicated visually with either a popup window or by displaying the currently selected option. A currently selected option is located adjacent to its respective selection menu for clarity sake. In the below photos of the mobile application it is clear that the UI changes as a user selects their different options.
+![Screenshot_20240225_203032_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/679865f5-389c-4f0c-9ead-53cd40a8d52a)
+![Screenshot_20240225_205158_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/962a0291-096e-4335-a153-f3880010d4c2)
+
 ### Responsiveness
-Currently the application is not having to wait for any responses, however in the future when this is implemented, these types of processes will be pushed to the forefront of currently occuring operations.
+Currently the application has immediate response time in terms of navigation and selection options. When a user begins scanning for devices there is a required wait time to scan for devices. During this wait time a popup is displayed, notifiying the user that a scan is in progress. This is currently set to 5 seconds to enable a thorough scanning of nearby devices for connection. Connecting to a device will also require a waiting/loading screen as we will need to make sure the connection is secure before allowing the user to continue in the app. This will also utilize some sort of popup or loading animation until the connection is established as secure. Below is a screenshot from the mobile application showing some of the mentioned UI elements.
+![Screenshot_20240225_203023_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/f9e4d6d1-a3aa-4bee-8e11-f9fe535e5c29)
+![Screenshot_20240225_203009_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/4079ce52-a2d8-4087-a28b-9a74dab73927)
 ## Build Quality
 
 ### Robustness
-During regular use, a user will not cause the mobile application to crash.
+During regular use, a user will find it hard to crash the application as the available options are relatively limited and usage of the Activity and Fragment models allow for realtive reliability. This is prevented as the app uses variables that are set and checked in order to allow the user to do things in the UI. When we have to begin validating if our BLE connections are secure or not, we will use tools within the android bluetooth API that allow for checking of connection state, and other possible error scenarios. This has been tested so far via mimicing what regular user behavior. 
 ### Consistency
 In terms of the ad detection feature, we are still trying to build an acceptable ad-detecting model. During this sprint, it was a goal to try to perform text classification text from television ads and regular television programs. At the point of submission, text has been gathered and separated, but the model has not yet been built.
 ### Aesthetic Rigor
-The remote can be tested through the Arduino IDE. Assets, in terms of text and images are accessible.
+The remote can be tested through the Arduino IDE. Assets, in terms of text and images are accessible. In terms of the mobile application, a uniform aesthetic has been selected to keep the UI clear and concise (refer to the images in the Useability section). At the moment some of the popup's are not completely consistent with the total aesthetic (differing in color, size, or shape), and we plan to address this once development of other features has progressed more.
 ## Vertical Features
 
 ### External Interface
