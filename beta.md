@@ -8,10 +8,10 @@
 2. Timesheet: https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
 
 ### Video Demos
-1. Remote: 
-2. App:
+1. Remote: https://youtu.be/QJvuvUjQ1c0
+2. App: https://youtu.be/JmA9nDBl78Y
 3. Ad detection Text:
-4. Ad detection Image:
+4. Ad detection Image: https://youtu.be/kRqk7YzGJUo
 
 ## Usability
 
