@@ -7,6 +7,12 @@
 1. Repo with issues/commit history: https://github.com/Emmett-Kogan/TVMaestro
 2. Timesheet: https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
 
+### Video Demos
+1. Remote: 
+2. App:
+3. Ad detection Text:
+4. Ad detection Image:
+
 ## Usability
 
 ### Interface
@@ -23,6 +29,7 @@ Changes within the mobile applications UI are indicated visually with either a p
 Currently the application has immediate response time in terms of navigation and selection options. When a user begins scanning for devices there is a required wait time to scan for devices. During this wait time a popup is displayed, notifiying the user that a scan is in progress. This is currently set to 5 seconds to enable a thorough scanning of nearby devices for connection. Connecting to a device will also require a waiting/loading screen as we will need to make sure the connection is secure before allowing the user to continue in the app. This will also utilize some sort of popup or loading animation until the connection is established as secure. Below is a screenshot from the mobile application showing some of the mentioned UI elements. In term's of the text classification model, transcription, sentence splitting, tokenizing, finding sentence embeddings, predicting the sentences, and then sending back predictions will all play into the amount of time that it takes for the model to send predictions.
 ![Screenshot_20240225_203023_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/f9e4d6d1-a3aa-4bee-8e11-f9fe535e5c29)
 ![Screenshot_20240225_203009_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/4079ce52-a2d8-4087-a28b-9a74dab73927)
+
 ## Build Quality
 
 ### Robustness
