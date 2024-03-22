@@ -1,17 +1,19 @@
-# Beta Build Report
+# Release Candidate
 
-### Repository Link
-1. https://github.com/Emmett-Kogan/TVMaestro
+## Links:
+Repository: https://github.com/Emmett-Kogan/TVMaestro
+Timesheet:  https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
+Demo:       [Youtube demo]() //Can we please have a merged video this time, especially since there is a time limit requirement
 
-### Time stamped evidence
-1. Repo with issues/commit history: https://github.com/Emmett-Kogan/TVMaestro
-2. Timesheet: https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
+# TVMaestro
+## Synopsis
+TVMaestro serves to reduce the amount of time users spend watching ads, by replacing that time with time spent watching alternative programs. TVMaestro is composed of a remote module, mobile application, a machine learning module. The ML model takes the broadcast being played on the user's TV, and identifies when an advertisement is being played, at which point it sends a signal to the remote module, which changes the channel. To do this, the remote module will be configured by the user (via the mobile app), such that it has recorded the necessary control signals from the user's TV remote, and, so that it has a 'schedule', or priority list of channels. When it receives the signal from the ML module, the remote will then emulate the original remote by replaying the recorded signals so that the channel is changed from one that is watching an advertisement, to a different one (which could also be playing an ad, in which case there would be another channel change once that has been detected). The mobile app, more specifcally, provides an interface to program the remote by sending commands over bluetooth that specify, when to calibrate the remote, walk the user through a calibration sequence, the priority list of channels and various other adjustments that could be made using the remote (e.g. changing the volume or toggling the power).
 
-### Video Demos
-1. Remote: https://youtu.be/QJvuvUjQ1c0
-2. App: https://youtu.be/JmA9nDBl78Y
-3. Ad detection Text:
-4. Ad detection Image: https://youtu.be/kRqk7YzGJUo
+## Project State !!Add to this for the rest of the progress made, I can't remember everything for the app and ml stuff
+So far, the remote module properly emulates signals from at least the test remote (a roku stick), as well as communicates over bluetooth to any phone, and processes all commands specified to configure the remote, load a schedule/priority list, and make other adjustments to the user's TV. This includes the design and implementation of various circuits for the signal reception and transmission, the I2C circuit between the NRF52840 board that deals with BLE communication and the RP2040 that does the rest of the functionality, the SPI circuit between the RP2040 and uSD card reader for persistent storage, and all code to drive these circuits, the state of the module, etc. Currently, most features specified for the remote module are fully working, however, as of right now, the SPI drivers for the uSD card storage solution are still in progress, as it was more complex than originally thought, and it was already behind schedule as of the beta.
+
+## Progress !!Add to this for the rest of the progress made during the rc
+During the work for the release candidate, for the remote module, features from the Beta were tested as per the Beta-spec, and potential bugs related to the emulation of TV signals have been addressed. The rest of the handlers for commands to be received from the mobile app were finished and while a lot of hours have been put into the uSD card driver, right now it is still behind and a work in progress unfortunatley.
 
 ## Usability
 
