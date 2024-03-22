@@ -1,0 +1,3 @@
+/home/emmett/TVMaestro/remote/build/pioasm/CMakeFiles/pioasm.dir
+/home/emmett/TVMaestro/remote/build/pioasm/CMakeFiles/edit_cache.dir
+/home/emmett/TVMaestro/remote/build/pioasm/CMakeFiles/rebuild_cache.dir

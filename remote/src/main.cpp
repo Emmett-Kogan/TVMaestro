@@ -1,6 +1,7 @@
 #include "../libraries/signal.h"
 #include <vector>
 #include <stdlib.h>
+#include <string.h>
 #include <pico/i2c_slave.h>
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
@@ -42,6 +43,7 @@ volatile uint8_t change_channel = 0;
 
 // Schedule
 std::vector<int> schedule;
+static uint32_t current_channel = 0;
 
 static void i2c_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
     if (event == I2C_SLAVE_RECEIVE)
@@ -75,6 +77,10 @@ int main() {
     // Init signal library
     signal_init();
 
+    // If there is an SD card plugged in, try to load a schedule from it
+    // If not a valid schedule, do not mark as calibrated
+    // If a valid schedule, load into the schedule variable
+
     while(1) {
         while(!i2c_flag && !change_channel) {
             sleep_ms(50); // I have no idea why but this makes a difference
@@ -85,6 +91,13 @@ int main() {
             // Change the channel
             printf("Changing channel\n");
             
+            // Need to change channel to whatever number in schedule[current_channel+1]
+            uint32_t new_channel = schedule[(current_channel + 1) % schedule.size()];
+
+            // Need to get each digit of new channel and send them in high to low order
+
+            current_channel = current_channel + 1 % schedule.size();
+
             // Debaounce and cleanup
             gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, true);
             sleep_ms(100);
@@ -107,30 +120,47 @@ int main() {
 
         switch(i2c_buffer[1]) {
             case 'r':
+                // Record a signal
                 record_signal(&buttons[button]);
                 printf("Button %d recorded\n", button);
                 break;
             case 'p':
+                // Play a signal
                 if (!buttons[button].last)
                     printf("Error: button signal has not been recorded");
                 else
                     play_signal(&buttons[button]);
                 break;
             case 'd':
+                // Display a signal
                 print_signal(&buttons[button]);
                 break;
             case 'i':
+                // Identify
                 printf("This is a TVMaestro!\n");
             case 'c':
-                // Will do a sequence of records
+            {
+                // Calibrate
+                for (int i = 0; i < USED_BUTTONS; i++)
+                    record_signal(&buttons[i]);
                 calibrared = 1;
                 break;
+            }
             case 's':
+            {
                 // Configure schedule variable
-                // Will take a space seperated list of channel numbers
-                // and push it to the schedule vector. Where the highest
-                // priority channel should be at index 0
+                schedule.clear();
+                char *tmp = strtok(i2c_buffer, " ");
+                while (1) {
+                    tmp = strtok(NULL, " ");
+                    if (!tmp) break;
+                    schedule.push_back(atoi(tmp));
+                }
+
+                // Write new version of schedule to SD card
+
                 break;
+            }
             case 'v':
                 // Adjust volume
                 while(i2c_buffer[index++] != ' ');
