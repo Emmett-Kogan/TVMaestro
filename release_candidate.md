@@ -1,19 +1,58 @@
 # Release Candidate
 
 ## Links:
-Repository: https://github.com/Emmett-Kogan/TVMaestro
-Timesheet:  https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0
-Demo:       [Youtube demo]() //Can we please have a merged video this time, especially since there is a time limit requirement
+[Repository](https://github.com/Emmett-Kogan/TVMaestro)  \
+[Timesheet](https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0)  \
+[Demo]() //Can we please have a merged video this time, especially since there is a time limit requirement
 
 # TVMaestro
 ## Synopsis
 TVMaestro serves to reduce the amount of time users spend watching ads, by replacing that time with time spent watching alternative programs. TVMaestro is composed of a remote module, mobile application, a machine learning module. The ML model takes the broadcast being played on the user's TV, and identifies when an advertisement is being played, at which point it sends a signal to the remote module, which changes the channel. To do this, the remote module will be configured by the user (via the mobile app), such that it has recorded the necessary control signals from the user's TV remote, and, so that it has a 'schedule', or priority list of channels. When it receives the signal from the ML module, the remote will then emulate the original remote by replaying the recorded signals so that the channel is changed from one that is watching an advertisement, to a different one (which could also be playing an ad, in which case there would be another channel change once that has been detected). The mobile app, more specifcally, provides an interface to program the remote by sending commands over bluetooth that specify, when to calibrate the remote, walk the user through a calibration sequence, the priority list of channels and various other adjustments that could be made using the remote (e.g. changing the volume or toggling the power).
 
 ## Project State !!Add to this for the rest of the progress made, I can't remember everything for the app and ml stuff
+
+### Remote Module
 So far, the remote module properly emulates signals from at least the test remote (a roku stick), as well as communicates over bluetooth to any phone, and processes all commands specified to configure the remote, load a schedule/priority list, and make other adjustments to the user's TV. This includes the design and implementation of various circuits for the signal reception and transmission, the I2C circuit between the NRF52840 board that deals with BLE communication and the RP2040 that does the rest of the functionality, the SPI circuit between the RP2040 and uSD card reader for persistent storage, and all code to drive these circuits, the state of the module, etc. Currently, most features specified for the remote module are fully working, however, as of right now, the SPI drivers for the uSD card storage solution are still in progress, as it was more complex than originally thought, and it was already behind schedule as of the beta.
 
-## Progress !!Add to this for the rest of the progress made during the rc
+The layout and connections of the various circuits are shown below, however, the SPI circuit is absent, though it is as simple as it being connected to the RP2040's gnd and 3.3v pins, with MOSI, MISO, and a GPIO pin being connected to the uSD card reader's SO, SI, and CS signals respectivley. \
+![Circuit](remote/screenshots/circuit.JPG)
+
+Here is also an updated bill of materials for the above circuit. \
+| Componenet              	| Count 	| Sourced from 	| Notes                                                                                           	|
+|-------------------------	|-------	|--------------	|-------------------------------------------------------------------------------------------------	|
+| TSOP4838                	| 1     	| [Mouser](https://www.mouser.com/ProductDetail/Vishay-Semiconductors/TSOP4838?qs=yGXpg7PJZCiwO12kec0Sug%3D%3D)       	|                                                                                                 	|
+| SIR-56ST3F              	| 1     	| [Mouser](https://www.mouser.com/ProductDetail/ROHM-Semiconductor/SIR-56ST3F?qs=4kLU8WoGk0szrTFKqpunAQ%3D%3D)       	|                                                                                                 	|
+| Adafruit Feather RP2040 	| 1     	| [Adafruit](https://www.adafruit.com/product/4884)     	| Any RP2040 will work, though the defines for each pin in the firmware will have to be modified and the Building/Running instructions assume this board. 	|
+| Adafruit Feather NRF52840 |1      | [Adafruit](https://www.adafruit.com/product/4062) | The code related to this board was built using ArduinoIDE, so the libraries used specify this specefic board. |   	|
+| 1 $\mathsf{k\Omega}$ Resistor     	| 3     	| [Any](https://www.amazon.com/1k-ohm-resistor/s?k=1k+ohm+resistor)          	|    |            
+| Push button | 1    | [Any](https://www.amazon.com/Momentary-Tactile-Button-Switch-Through/dp/B0BK39MH7B) | This was simply used to simulate communication from the ML MCU and is unnecessary in the final build |
+| uSD Card Reader Breakout Board | 1 | [Adafruit](https://www.adafruit.com/product/4682) | Used to interface with a uSD card for persistent storage of priority lists |
+
+Currently, the NRF52840 is not available to be shown with a picture of the current breadboard implementation of the remote module, but, the following is a picture of the current state of the board. \
+![Board](remote/screenshots/breadboard.JPG)
+
+To better illustrate all of the commands implemented and their arguements, provided is a table of them and their descriptions from the remote module specification: \
+| Command | Arguements | Explanation |
+|-------------------------	|-------	|--------------	|
+| !record | button index | Overwrite the button signal |
+| !play | button index | Transmit the signal of the button |
+| !display | button index | Print internal representation of the button's signal |
+| !identify | N/A | Prints a string to USB |
+| !calibrate | N/A | Initiates a calibration sequence where the user must press 0-9, power, then volume up followed by volume down to record each of the buttons |
+| !schedule | schedule | Configure the module's schedule, where the scheudle is a space seperated list of channel numbers |
+| !vol | +/- | Adjust the volume by sending this command follwed by + or - to adjust up or down respectivley |
+
+The remaining issues with the remote module all deal with the uSD card driver, however, those issues do not impact the rest of the project as none of them are attempted so long as a uSD card is not detected in the reader as there is a sanity check of the `DET` pin provided by the adafruit breakout board prior to any attempts at communication. 
+
+## Progress !!Add to this for the rest of the progress made during the rc, although it doesn't need to be in seperate sections like the above section, it should still flow well and not be repetitive.
 During the work for the release candidate, for the remote module, features from the Beta were tested as per the Beta-spec, and potential bugs related to the emulation of TV signals have been addressed. The rest of the handlers for commands to be received from the mobile app were finished and while a lot of hours have been put into the uSD card driver, right now it is still behind and a work in progress unfortunatley.
+
+## Building and Running
+
+### Remote Module
+This assumes that the circuit has been constructed and the RP2040 has been connected to your computer.  Furhter, this also assumes the same for the NRF52840 and that the ArduinoIDE [setup](https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/arduino-bsp-setup) guide has also been followed. \
+To build the remote module, first clone the repository into a linux system (WSL works fine). You need to have cloned the pico-sdk somewhere else on your system as well. Export the path to the pico-sdk directory, e.g. `export PICO_SDK_PATH=~/pico/pico-sdk` so that cmake can generate the correct paths for dependencies. Change directories to the `TVMaestro/remote/build` directory or make it if it does not yet exist, then type `cmake ..` to generate the build scripts. Type `make` to build the project, note that this will generate a `remote.uf2` binary that we will now copy to the RP2040 board. You can set the feather to bootloader mode by holding reset and the 'BOOTSEL' button at the same time, and releasing the reset button first. A USB device should show up on your system and you can simply drag the .uf2 to the device. \
+Furthermore, to build the BLE code and upload it to the NRF52840 feather, assuming the NRF52840 development guide with ArduinoIDE has been followed, you should simply be able to open the `controller` files in ArduinoIDE and compile/upload them to the board. I have found that this board has an error where sometimes when uploading to the board it will return some DFU error when updating the firmware. If this happens, simply put the board into the bootloader write mode by pressing the reset button twice quickly (if it is in bootloader mode, the neopixel LED will be green), update the COM port in the IDE to be the new NRF52840 port, and upload again.
 
 ## Usability
 
