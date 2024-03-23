@@ -5,13 +5,33 @@
 #include <pico/i2c_slave.h>
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
+#include "hardware/flash.h"
 
+// Macros
+#define BIT(n) (0x1<<n)
+
+// App related defines
 #define MAX_BUTTONS 20
+#define MAX_CHANNELS 100
 #define USED_BUTTONS 12
+
+// Communication defines
 #define I2C_SLAVE_ADDRESS 0x42
 #define SDA     0x02
 #define SCL     0x03
 #define BTN_PIN 13
+
+// Flash defines
+#define FLASH_TARGET_OFFSET (256 * 1024)
+#define FLASH_TARGET_CONTENTS ((const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET))
+
+// Global data structure defines
+#define GDSB_SIZE (sizeof(button_t)*MAX_BUTTONS + sizeof(uint32_t)*(MAX_CHANNELS+1+1+1))
+#define BUTTON_OFFSET 0
+#define SCHEDULE_OFFSET (sizeof(button_t)*MAX_BUTTONS)
+#define CHANNEL_COUNT_OFFSET (SCHEDULE_OFFSET+(sizeof(uint32_t)*MAX_CHANNELS))
+#define CURRENT_CHANNEL_OFFSET (CHANNEL_COUNT_OFFSET+4)
+#define VALID_FLAGS_OFFSET (CURRENT_CHANNEL_OFFSET+4)
 
 // Buttons 0-9 will be the digits
 #define POWER 10
@@ -19,31 +39,25 @@
 #define VD 12
 // 13-19 will be reserved for furture use
 
-// Commands
-//     !record <button id>
-//     !play <button id>
-//     !display <button id>
-//     !identify
-    
-//     setup for:
-//     !calibrate
-//     !schedule <schedule>
-//     !vol <+/->
+void copy_config_to_flash(void);
+void copy_config_from_flash(void);
+void change_channel(uint32_t channel);
 
-static button_t buttons[MAX_BUTTONS];
-static uint8_t calibrared = 0;
+// Global data structures (these start at 0x20001234, and are 16,604 bytes total)
+// This is just an easier way to guarantee the placement since I don't feel like refactoring everything else to use volatile
+static uint8_t global_data_structures_buffer[GDSB_SIZE];
+button_t *const buttons = (button_t *const) &global_data_structures_buffer[BUTTON_OFFSET];
+uint32_t *const schedule = (uint32_t *const) &global_data_structures_buffer[SCHEDULE_OFFSET];
+uint32_t *const channel_count = (uint32_t *const) &global_data_structures_buffer[CHANNEL_COUNT_OFFSET];
+uint32_t *const current_channel = (uint32_t *const) &global_data_structures_buffer[CURRENT_CHANNEL_OFFSET];
+uint32_t *const valid_flags = (uint32_t *const) &global_data_structures_buffer[VALID_FLAGS_OFFSET];
+// Valid flags: BIT0 -> calibration, BIT1 -> schedule
 
-// Communbication variables for commands
+// Communication variables
 static char i2c_buffer[512];
 static size_t i2c_index = 0;
 static uint8_t i2c_flag = 0;
-
-// Flag for when told to change channels by ML MCU
-volatile uint8_t change_channel = 0;
-
-// Schedule
-std::vector<int> schedule;
-static uint32_t current_channel = 0;
+volatile uint8_t change_channel_flag = 0;
 
 static void i2c_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
     if (event == I2C_SLAVE_RECEIVE)
@@ -54,12 +68,17 @@ static void i2c_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
 
 static void button_handler(uint gpio, uint32_t events) {
     gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, false);
-    change_channel = 1;
+    change_channel_flag = 1;
 }
 
 int main() {
     // Init peripherals
     stdio_init_all();
+
+    // GPIO init
+    gpio_init(BTN_PIN);
+    gpio_set_dir(BTN_PIN, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(BTN_PIN, GPIO_IRQ_EDGE_RISE, true, &button_handler);
 
     // I2C init
     gpio_set_function(SDA, GPIO_FUNC_I2C);
@@ -69,17 +88,11 @@ int main() {
     i2c_init(i2c1, 100000); 
     i2c_slave_init(i2c1, I2C_SLAVE_ADDRESS, &i2c_handler);
 
-    // GPIO init
-    gpio_init(BTN_PIN);
-    gpio_set_dir(BTN_PIN, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(BTN_PIN, GPIO_IRQ_EDGE_RISE, true, &button_handler);
-    
     // Init signal library
     signal_init();
 
-    // If there is an SD card plugged in, try to load a schedule from it
-    // If not a valid schedule, do not mark as calibrated
-    // If a valid schedule, load into the schedule variable
+    // Grab whatever is in flash, it may be old config data, or it could be garbage
+    copy_config_from_flash();
 
     while(1) {
         while(!i2c_flag && !change_channel) {
@@ -87,21 +100,15 @@ int main() {
         }
 
         // Handle case for button press
-        if (change_channel) {
+        if (change_channel_flag) {
             // Change the channel
-            printf("Changing channel\n");
-            
-            // Need to change channel to whatever number in schedule[current_channel+1]
-            uint32_t new_channel = schedule[(current_channel + 1) % schedule.size()];
-
-            // Need to get each digit of new channel and send them in high to low order
-
-            current_channel = current_channel + 1 % schedule.size();
+            change_channel(schedule[(*current_channel) + 1 % (*channel_count)]);
+            *current_channel = ((*current_channel)+1) % (*channel_count);     
 
             // Debaounce and cleanup
             gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, true);
             sleep_ms(100);
-            change_channel = 0;
+            change_channel_flag = 0;
             continue;
         }
 
@@ -138,33 +145,52 @@ int main() {
             case 'i':
                 // Identify
                 printf("This is a TVMaestro!\n");
+                break;
+            case 'z':   // this is for debug/demo purposes
+                // 
+                if (!(*valid_flags & BIT(1)))
+                    break;
+                for (int i = 0; i < *channel_count; i++)
+                    printf("Channel %d:\t%d\n", i, schedule[i]);
+                break;
             case 'c':
             {
                 // Calibrate
                 for (int i = 0; i < USED_BUTTONS; i++)
                     record_signal(&buttons[i]);
-                calibrared = 1;
+                *(valid_flags) |= BIT(0);
+
+                // Update flash
+                copy_config_to_flash();
+
                 break;
             }
             case 's':
             {
                 // Configure schedule variable
-                schedule.clear();
+                *current_channel = 0;
+                *channel_count = 0;
                 char *tmp = strtok(i2c_buffer, " ");
                 while (1) {
                     tmp = strtok(NULL, " ");
                     if (!tmp) break;
-                    schedule.push_back(atoi(tmp));
+                    schedule[*channel_count] = atoi(tmp);
+                    *channel_count += 1;
                 }
+                *(valid_flags) |= BIT(1);
 
-                // Write new version of schedule to SD card
+                // Write new version of schedule to flash
+                copy_config_to_flash();
+
+                // Go to new current channel
+                change_channel(schedule[(*current_channel)]);
 
                 break;
             }
             case 'v':
                 // Adjust volume
                 while(i2c_buffer[index++] != ' ');
-                if (calibrared)
+                if (*valid_flags & BIT(0))
                     play_signal(&buttons[(i2c_buffer[index] == '+') ? VU : VD]);
 
                 break;
@@ -176,4 +202,24 @@ int main() {
         i2c_index = 0;
         i2c_flag = 0;
     }
+}
+
+// Every time either the calibration or scheudle changes, write them to flash
+void copy_config_to_flash(void) {
+    flash_range_erase(FLASH_TARGET_OFFSET, GDSB_SIZE);
+    flash_range_program(FLASH_TARGET_OFFSET, global_data_structures_buffer, GDSB_SIZE);
+}
+
+// On power up, load the existing calibration or schedule from flash if present
+void copy_config_from_flash(void) {
+    for (int i = 0; i < GDSB_SIZE; i++)
+        global_data_structures_buffer[i] = FLASH_TARGET_CONTENTS[i];
+}
+
+// Will only handle the signal calls to change the channel
+void change_channel(uint32_t channel) {
+    printf("Change channel called!\n");
+
+
+    return;
 }

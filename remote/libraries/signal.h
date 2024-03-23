@@ -18,7 +18,7 @@
 
 typedef struct button_t {
     uint32_t signal[SIGNAL_SIZE];  // store the compressed signal
-    uint8_t  last;                  // last valid spot in signal
+    uint32_t  last;                  // last valid spot in signal
 } button_t;
 
 // Initializes the necessary IO
