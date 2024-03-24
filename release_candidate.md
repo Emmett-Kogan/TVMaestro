@@ -12,9 +12,9 @@ TVMaestro serves to reduce the amount of time users spend watching ads, by repla
 ## Project State !!Add to this for the rest of the progress made, I can't remember everything for the app and ml stuff
 
 ### Remote Module
-So far, the remote module properly emulates signals from at least the test remote (a roku stick), as well as communicates over bluetooth to any phone, and processes all commands specified to configure the remote, load a schedule/priority list, and make other adjustments to the user's TV. This includes the design and implementation of various circuits for the signal reception and transmission, the I2C circuit between the NRF52840 board that deals with BLE communication and the RP2040 that does the rest of the functionality, the SPI circuit between the RP2040 and uSD card reader for persistent storage, and all code to drive these circuits, the state of the module, etc. Currently, most features specified for the remote module are fully working, however, as of right now, the SPI drivers for the uSD card storage solution are still in progress, as it was more complex than originally thought, and it was already behind schedule as of the beta.
+So far, the remote module properly emulates signals from at least the test remote (a roku stick), as well as communicates over bluetooth to any phone, and processes all commands specified to configure the remote, load a schedule/priority list, and make other adjustments to the user's TV. This includes the design and implementation of various circuits for the signal reception and transmission, the I2C circuit between the NRF52840 board that deals with BLE communication and the RP2040 that does the rest of the functionality, the SPI circuit between the RP2040 and uSD card reader for persistent storage, and all code to drive these circuits, the state of the module, etc. Currently, most features specified for the remote module are fully working, and, the configuration data (button calibrations and schedules) are being preserved across power cycle by backing them up to the onboard flash, and loading the starting configuration from the flash and identifying it's validity before use.
 
-The layout and connections of the various circuits are shown below, however, the SPI circuit is absent, though it is as simple as it being connected to the RP2040's gnd and 3.3v pins, with MOSI, MISO, and a GPIO pin being connected to the uSD card reader's SO, SI, and CS signals respectivley. \
+The layout and connections of the various circuits are shown below. \
 ![Circuit](remote/screenshots/circuit.JPG)
 
 Here is also an updated bill of materials for the above circuit.
@@ -26,9 +26,8 @@ Here is also an updated bill of materials for the above circuit.
 | Adafruit Feather NRF52840 |1      | [Adafruit](https://www.adafruit.com/product/4062) | The code related to this board was built using ArduinoIDE, so the libraries used specify this specefic board. |   	|
 | 1 $\mathsf{k\Omega}$ Resistor     	| 3     	| [Any](https://www.amazon.com/1k-ohm-resistor/s?k=1k+ohm+resistor)          	|    |            
 | Push button | 1    | [Any](https://www.amazon.com/Momentary-Tactile-Button-Switch-Through/dp/B0BK39MH7B) | This was simply used to simulate communication from the ML MCU and is unnecessary in the final build |
-| uSD Card Reader Breakout Board | 1 | [Adafruit](https://www.adafruit.com/product/4682) | Used to interface with a uSD card for persistent storage of priority lists |
 
-Currently, the NRF52840 is not available to be shown with a picture of the current breadboard implementation of the remote module, but, the following is a picture of the current state of the board. \
+The following is a picture of the current state of the board. \
 ![Board](remote/screenshots/breadboard.png)
 
 To better illustrate all of the commands implemented and their arguements, provided is a table of them and their descriptions from the remote module specification:
@@ -42,7 +41,7 @@ To better illustrate all of the commands implemented and their arguements, provi
 | !schedule | schedule | Configure the module's schedule, where the scheudle is a space seperated list of channel numbers |
 | !vol | +/- | Adjust the volume by sending this command follwed by + or - to adjust up or down respectivley |
 
-The remaining issues with the remote module all deal with the uSD card driver, however, those issues do not impact the rest of the project as none of them are attempted so long as a uSD card is not detected in the reader as there is a sanity check of the `DET` pin provided by the adafruit breakout board prior to any attempts at communication. 
+There are no known remaining issues with the remote module, however, more testing of the persistent state solution need to be performed, which will be significantly easier once the mobile application team is finished with the NRF52840 as performing end-to-end tests with it will be the best way to test the entire remote module. Further, testing the remote module with various setups, with different kinds of remotes, will also be beneficial to verify that it works outside of just the remotes available to me.
 
 ## Progress 
 !!Add to this for the rest of the progress made during the rc, although it doesn't need to be in seperate sections like the above section, it should still flow well and not be repetitive.
