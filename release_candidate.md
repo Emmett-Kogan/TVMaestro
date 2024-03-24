@@ -29,7 +29,7 @@ Here is also an updated bill of materials for the above circuit.
 | uSD Card Reader Breakout Board | 1 | [Adafruit](https://www.adafruit.com/product/4682) | Used to interface with a uSD card for persistent storage of priority lists |
 
 Currently, the NRF52840 is not available to be shown with a picture of the current breadboard implementation of the remote module, but, the following is a picture of the current state of the board. \
-![Board](remote/screenshots/breadboard.JPG)
+![Board](remote/screenshots/breadboard.png)
 
 To better illustrate all of the commands implemented and their arguements, provided is a table of them and their descriptions from the remote module specification:
 | Command | Arguements | Explanation |
