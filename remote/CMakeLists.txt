@@ -19,6 +19,7 @@ target_link_libraries(signal
     hardware_gpio
     hardware_adc
     hardware_i2c
+    hardware_flash
     pico_i2c_slave
 )
 
@@ -29,6 +30,7 @@ target_link_libraries(${PROJECT_NAME}
     hardware_gpio
     hardware_adc
     hardware_i2c
+    hardware_flash
     pico_i2c_slave
     signal
 )
