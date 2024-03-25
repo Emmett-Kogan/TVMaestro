@@ -71,6 +71,13 @@ To build the remote module, first clone the repository into a linux system (WSL 
 Furthermore, to build the BLE code and upload it to the NRF52840 feather, assuming the NRF52840 development guide with ArduinoIDE has been followed, you should simply be able to open the `controller` files in ArduinoIDE and compile/upload them to the board. I have found that this board has an error where sometimes when uploading to the board it will return some DFU error when updating the firmware. If this happens, simply put the board into the bootloader write mode by pressing the reset button twice quickly (if it is in bootloader mode, the neopixel LED will be green), update the COM port in the IDE to be the new NRF52840 port, and upload again.
 
 ### ML Module
+First open jupyter notebook in the audioClassification folder of this repository. Second, get a .mp3 file of TV broadcast audio, then use transcribe.ipynb to transcribe that particular .mp3 file. Use build_dataset.ipynb, but make the second cell look like:
+
+sentences = getSentences('yourFile.txt')
+df = pd.DataFrame({'sentences': sentences})
+df.to_csv('yourDataset.csv', index=False)
+
+Next, run the excel_visualization.ipynb on the .csv file that was created, and then look at the model's predictions in the new excel file made with this .ipynb file. Red cells mark sentences marked as ads. Compare these predictions alongside the video you are running through the model.
 ### App
 The below instructions assume a user has Android Studio downloaded as well as their android device connected to their computer over USB. It also assumes the user has enabled debugging/developing over USB in the developer options of their android device.
 To build the mobile application and run it natively on an andorid device, clone the mobile application repository and open the folder as a project in android studio. In the device manager section of android studio select your device. Build the application using the "Run 'app'" button located in the top navigation bar. This will launch the app on the android device after the build has been complete.
