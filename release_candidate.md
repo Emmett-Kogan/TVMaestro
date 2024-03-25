@@ -3,7 +3,7 @@
 ## Links:
 [Repository](https://github.com/Emmett-Kogan/TVMaestro)  \
 [Timesheet](https://docs.google.com/spreadsheets/d/1YhgjYHVoKcEeV9-Mo8SlOOsEO-r5k9PXPGEjSaAOhO4/edit#gid=0)  \
-[Demo]() //Can we please have a merged video this time, especially since there is a time limit requirement
+[Demo](https://youtu.be/cgaogLIKBzg?si=9I4l5czhxjKtClDw)
 
 # TVMaestro
 ## Synopsis
