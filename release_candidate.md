@@ -9,8 +9,7 @@
 ## Synopsis
 TVMaestro serves to reduce the amount of time users spend watching ads, by replacing that time with time spent watching alternative programs. TVMaestro is composed of a remote module, mobile application, a machine learning module. The ML model takes the broadcast being played on the user's TV, and identifies when an advertisement is being played, at which point it sends a signal to the remote module, which changes the channel. To do this, the remote module will be configured by the user (via the mobile app), such that it has recorded the necessary control signals from the user's TV remote, and, so that it has a 'schedule', or priority list of channels. When it receives the signal from the ML module, the remote will then emulate the original remote by replaying the recorded signals so that the channel is changed from one that is watching an advertisement, to a different one (which could also be playing an ad, in which case there would be another channel change once that has been detected). The mobile app, more specifcally, provides an interface to program the remote by sending commands over bluetooth that specify, when to calibrate the remote, walk the user through a calibration sequence, the priority list of channels and various other adjustments that could be made using the remote (e.g. changing the volume or toggling the power).
 
-## Project State !!Add to this for the rest of the progress made, I can't remember everything for the app and ml stuff
-
+## Project State
 ### Remote Module
 So far, the remote module properly emulates signals from at least the test remote (a roku stick), as well as communicates over bluetooth to any phone, and processes all commands specified to configure the remote, load a schedule/priority list, and make other adjustments to the user's TV. This includes the design and implementation of various circuits for the signal reception and transmission, the I2C circuit between the NRF52840 board that deals with BLE communication and the RP2040 that does the rest of the functionality, the SPI circuit between the RP2040 and uSD card reader for persistent storage, and all code to drive these circuits, the state of the module, etc. Currently, most features specified for the remote module are fully working, and, the configuration data (button calibrations and schedules) are being preserved across power cycle by backing them up to the onboard flash, and loading the starting configuration from the flash and identifying it's validity before use.
 
@@ -42,6 +41,8 @@ To better illustrate all of the commands implemented and their arguements, provi
 | !vol | +/- | Adjust the volume by sending this command follwed by + or - to adjust up or down respectivley |
 
 There are no known remaining issues with the remote module, however, more testing of the persistent state solution need to be performed, which will be significantly easier once the mobile application team is finished with the NRF52840 as performing end-to-end tests with it will be the best way to test the entire remote module. Further, testing the remote module with various setups, with different kinds of remotes, will also be beneficial to verify that it works outside of just the remotes available to me.
+
+### ML Module
 
 ### Mobile Application
 Currently, the mobile application serves as the UI for a user to interact with the other modules of the project. It currently is running natively on android devices through the use of development over USB with android studio. The app features two Fragments, the 'Home' and 'Schedule' pages which are accessable via the bottom navigation bar. The top bar displays the current fragment. These are focuesed on allowing the user to pair with their hardware and select scheduling options respectfully. The Home page allows a user to prompt a BLE scan and discover nearby devices, like the NRF52840. It allows users to select nearby devices, and if it is the hardware module, it allows the connection to occur. Once this connection is successful the user is notified. The Schedule page is where a user will edit the scheduling / ad detection options. It currently sports placeholder options for selecting a priority channel, and to enable or disable ad detection. Images of the two main pages are included below. 
@@ -75,12 +76,13 @@ The below instructions assume a user has Android Studio downloaded as well as th
 To build the mobile application and run it natively on an andorid device, clone the mobile application repository and open the folder as a project in android studio. In the device manager section of android studio select your device. Build the application using the "Run 'app'" button located in the top navigation bar. This will launch the app on the android device after the build has been complete.
 
 ## Usability
-
 ### Interface
 In terms of the UI for the mobile application, a user can access available devices to pair to via BLE as well as the options for scheduling such as selecting channel schedules or enabling/disabling add detections, as well as options for controlling the hardware unit. The hardware options will be added in the near future. Below is some screenshots from an android device running the application with some of the relevant UI pages.
 ![Screenshot_20240225_203002_AndroidApp (1)](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/d455b137-35ef-4984-9da7-d94336fb88c1)
+
 ### Navigation
 Current navigation through the mobile application is very intuitive. The two different activities (Home and Schedule) selectable on the bottom naviagtion bar allow users to quickly swap between setup and running options which are displayed to the user upon selection of the particular activity. This is depicted in the photo above. Navigating popup menus is also intuitive as each is accompanied with its own instructions, and users are returned to the previous activity after making a selection. These menus can be seen in the below section.
+
 ### Perception
 Changes within the mobile applications UI are indicated visually with either a popup window or by displaying the currently selected option. A currently selected option is located adjacent to its respective selection menu for clarity sake. In the below photos of the mobile application it is clear that the UI changes as a user selects their different options.
 ![Screenshot_20240225_203032_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/679865f5-389c-4f0c-9ead-53cd40a8d52a)
@@ -93,17 +95,17 @@ Currently the application has immediate response time in terms of navigation and
 ![Screenshot_20240324_220549_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/6d39401c-47d5-463b-be99-ab5493b6b8c7)
 
 ## Build Quality
-
 ### Robustness
 During regular use, a user will find it hard to crash the application as the available options are relatively limited and usage of the Activity and Fragment models allow for realtive reliability. This is prevented as the app uses variables that are set and checked in order to allow the user to do things in the UI. When we have to begin validating if our BLE connections are secure or not, we will use tools within the android bluetooth API that allow for checking of connection state, and other possible error scenarios. This has been tested so far via mimicing what regular user behavior. Specifically we want to utilize the BluetoothGattCallback and onConnectionStateChange methods as these provide a way to check a status parameter which relates to the connection quality. This has been tested so far via mimicing what regular user behavior.  
+
 ### Consistency
 the number of sentences used in training and testing the ad detection text classification model increased from around 7000 sentences to 18000 sentences. Three different kinds of models were used: logistic regression, Naive Bayes, and support vector machine. The support vector machine performed very well on the test data which was about 20% of the total data. Its accuracy was ~88%, its precision was 90%, and its recall was 58%. The model was ran on an hour of college basketball and an hour of walking dead and performed quite well. That is, if 3/5 of each 5 sentence block is marked an ad that is a switch. Usually switches only occurred on advertisement segments, and they would occur pretty soon into the ad segment.
+
 ### Aesthetic Rigor
 The remote can be tested through the Arduino IDE. Assets, in terms of text and images are accessible. In terms of the mobile application, a uniform aesthetic has been selected to keep the UI clear and concise (refer to the images in the Useability section). At the moment some of the popup's are not completely consistent with the total aesthetic (differing in color, size, or shape), and we plan to address this once development of other features has progressed more. For instance,  in the image below, the popup does not match the other colors associated with the app.
 ![Screenshot_20240225_203009_AndroidApp](https://github.com/Emmett-Kogan/TVMaestro/assets/80291937/cacd4325-1dda-448b-854c-c4aa9303810d)
 
 ## Vertical Features
-
 ### External Interface
 The remote module is now implemented using an NRF52840 to handle all bluetooth communication to a phone, which communicates with an RP2040 which handles any adc/signal processing and managing schedules. The BLE module was implemented using ArduinoIDE, and the pico module was implemented using the relevant sdk in C. It is functionally the same as the previous builds, but instead of communicating to a laptop over USB, the remote module advertises it's own bluetooth connection, and has a series of commands implemnted to configure and replay buttons, initiate a calibration sequence, and schedule configuration. The two MCUs communicate using I2C, as the NRF52840 doesn't actually have a secondary accessible UART, so the NRF52840 stores commands in a buffer and issues them to the pico. The pico also communicates with the ML module, for when to change channels, and this is implemented with a single GPIO input pin, that raises an interrupt once the level shifts from low to high. This was selected so that any ML solution that the other part of the project ended up implementing could communicate with the remote module, as the required resouces is literally one GPIO pin. For the sake of demo purposes, as the ML MCU was not available during the video recording process, I setup a button circuit to simulate creating rising edges to cause channel changes. More details about the progress made on these features, as well as specifics for the remote module itself were listed in the corresponding project state and project progress sections.
 
