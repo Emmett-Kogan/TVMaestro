@@ -53,6 +53,8 @@ The main thing focused on during this sprint was to catch up the persistent stat
 
 ### ML Module
 ### App
+This sprint, work for the mobile application was dedicated to establishing a connection between the NRF52840 device and our mobile application. To achieve this, we utilized the BluetoothGattCallback, ConnectGatt, and PrintGattTable methods. The BluetoothGattCallback handled Bluetooth-related events like correct permissions and storing the Gatt related info, ConnectGatt initiated the connection process, and PrintGattTable aided in debugging and validation by visualizing the GATT table structure through logging. Essentially, once a user has selected to pair and the devices are shown after scanning, the connectGatt method is called with the selected bluetooth device as well as the predefined BluetoothGattCallback method. Once this method returns, the user is notified that the connection has occurred. Additionally, the PrintGattTable function was implemented to display the services and their characteristics provided by the NRF5240.
+Additional work was also done on the UI portion of the connection screen. There was a bug causing a discrepancy between what bluetooth device was being selected by a user, and what the application thought the user was selecting. This was fixed by making the app verify that a bluetooth device is indeed a hardware unit before connecting. Modification of the notifications related to scanning and connecting was also done to be more clear to the user what was occurring. Some of the home screen text now updates based on the current state of pairing.
 
 ## Building and Running
 
@@ -63,6 +65,8 @@ Furthermore, to build the BLE code and upload it to the NRF52840 feather, assumi
 
 ### ML Module
 ### App
+The below instructions assume a user has Android Studio downloaded as well as their android device connected to their computer over USB. It also assumes the user has enabled debugging/developing over USB in the developer options of their android device.
+To build the mobile application and run it natively on an andorid device, clone the mobile application repository and open the folder as a project in android studio. In the device manager section of android studio select your device. Build the application using the "Run 'app'" button located in the top navigation bar. This will launch the app on the android device after the build has been complete.
 
 ## Usability
 
