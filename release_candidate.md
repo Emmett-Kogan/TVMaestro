@@ -53,8 +53,6 @@ Currently, the mobile application serves as the UI for a user to interact with t
 
 
 ## Progress 
-!!Add to this for the rest of the progress made during the rc, although it doesn't need to be in seperate sections like the above section, it should still flow well and not be repetitive.
-
 ### Remote Module
 During the work for the release candidate, features from the Beta were tested as per the Beta-spec, and potential bugs related to the emulation of TV signals have been addressed. Furhter we did some performance testing for the bluetooth connection, sending command packets to the remote module at various distances and obstruction conditions, and determined that the MTTF of the connection without any checksums/redundancy was acceptable, and that resending the packet in the event of a malfuntion was a suitable solution. Furhter, the rest of the handlers for commands to be received from the mobile app were finished, as well as adjustments to implementations of sending signals using the IR transmitter.
 
@@ -67,7 +65,6 @@ This sprint, work for the mobile application was dedicated to establishing a con
 Additional work was also done on the UI portion of the connection screen. There was a bug causing a discrepancy between what bluetooth device was being selected by a user, and what the application thought the user was selecting. This was fixed by making the app verify that a bluetooth device is indeed a hardware unit before connecting. Modification of the notifications related to scanning and connecting was also done to be more clear to the user what was occurring. Some of the home screen text now updates based on the current state of pairing.
 
 ## Building and Running
-
 ### Remote Module
 This assumes that the circuit has been constructed and the RP2040 has been connected to your computer.  Furhter, this also assumes the same for the NRF52840 and that the ArduinoIDE [setup](https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/arduino-bsp-setup) guide has also been followed. \
 To build the remote module, first clone the repository into a linux system (WSL works fine). You need to have cloned the pico-sdk somewhere else on your system as well. Export the path to the pico-sdk directory, e.g. `export PICO_SDK_PATH=~/pico/pico-sdk` so that cmake can generate the correct paths for dependencies. Change directories to the `TVMaestro/remote/build` directory or make it if it does not yet exist, then type `cmake ..` to generate the build scripts. Type `make` to build the project, note that this will generate a `remote.uf2` binary that we will now copy to the RP2040 board. You can set the feather to bootloader mode by holding reset and the 'BOOTSEL' button at the same time, and releasing the reset button first. A USB device should show up on your system and you can simply drag the .uf2 to the device. \
@@ -126,5 +123,4 @@ The remote module also needs a method to communicate with the mobile app, and to
 
 On the Android Studio side of things, the app communicates by utilizing a BLE scan method to first locate the remote module. This allows the mobile device to take in advertising bluetooth devices.  The connection is then established by using the BluetoothGattCallback and ConnectGatt methods which establish a server client relationship with the hardware module and the mobile app. By getting the Gatt information from the NRF52840, such as the services it provides and their characteristics, we can then engage in communication other than just pairing. This Gatt information is acquired via the PrintGattTable method, which provides us with the specific UUID’s needed to read/write to a specific service and its characteristics. This information is important to obtain if we want to send any data to the hardware.
 
-// Either Matthew or Gary needs to update/expand this section for the release candidate
 In terms of the gathering data for the model, an HDMI capture card was used to record live television broadcast off of a Roku using OBS. The videos were converted into audio files and then transcribed using OpenAI's Whisper. Then the transcriptions were separated into ads sentences and non-ads sentences through human labeling. We still need to work on all the mechanisms of having the model communicate with the MCU, and the remote.
