@@ -52,6 +52,8 @@ To prove that this actually works, below are a few screenshots of the signal fro
 ### Comparison of regenerated and original signals
 ![](screenshots/original-vs-recreated.JPG)
 
+[Remote module release candidate demo link](https://youtu.be/ckK17YBWTac)
+
 ## Known issues
 1. The ADC samples and toggling the GPIO pin are not synchronzied correctly when sending/receiving a signal. This causes a bit of variance that prevents the remote from working all of the time.
 2. The current button setup for simulating signals from the ML MCU is not being debounced properly so there are times where repeated change channel events occur. Currently the interrupt is just being disabled for 100ms, but, I haven't had a chance to look at how long the button bounces for. This should not be an issue moving forward as a GPIO pin sending the signal from the ML MCU should not bounce as severly (or at all). 
