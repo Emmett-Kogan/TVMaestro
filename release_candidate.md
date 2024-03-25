@@ -43,6 +43,9 @@ To better illustrate all of the commands implemented and their arguements, provi
 
 There are no known remaining issues with the remote module, however, more testing of the persistent state solution need to be performed, which will be significantly easier once the mobile application team is finished with the NRF52840 as performing end-to-end tests with it will be the best way to test the entire remote module. Further, testing the remote module with various setups, with different kinds of remotes, will also be beneficial to verify that it works outside of just the remotes available to me.
 
+### Mobile Application
+Currently, the mobile application serves as the UI for a user to interact with the other modules of the project. It currently is running natively on android devices through the use of development over USB with android studio. The app features two Fragments, the 'Home' and 'Schedule' pages. These are focuesed on allowing the user to pair with their hardware and select scheduling options respectfully. The Home page allows a user to prompt a BLE scan and discover nearby devices, like the NRF52840. It allows users to select nearby devices, and if it is the hardware module, it allows the connection to occur. Once this connection is successful the user is notified. 
+
 ## Progress 
 !!Add to this for the rest of the progress made during the rc, although it doesn't need to be in seperate sections like the above section, it should still flow well and not be repetitive.
 
