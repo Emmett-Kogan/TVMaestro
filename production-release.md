@@ -1,4 +1,4 @@
-# Release Candidate
+# Production Release
 
 ## Links:
 [Repository](https://github.com/Emmett-Kogan/TVMaestro)  \
