@@ -50,6 +50,7 @@ At this point, the ML model has been trained on ~14,500 sentences which is 16 ho
 
 ### Mobile Application
 Currently, the mobile application serves as the UI for a user to interact with the other modules of the project. It currently is running natively on android devices through the use of development over USB with android studio. The app features two Fragments, the 'Home' and 'Schedule' pages which are accessable via the bottom navigation bar. The top bar displays the current fragment. These are focuesed on allowing the user to pair with their hardware and select scheduling options respectfully. The Home page allows a user to prompt a BLE scan and discover nearby devices, like the NRF52840. It allows users to select nearby devices, and if it is the hardware module, it allows the connection to occur. Once this connection is successful the user is notified. The Schedule page is where a user will edit the scheduling options. It currently sports options for calibration, priority channel selection, and volume control. Images of the two main pages are included below. 
+
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240225_203002_AndroidApp%20(1).jpg" alt="Image Description" width="300">
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240414_214040_AndroidApp.jpg" alt="Image Description" width="300">
 
@@ -83,6 +84,7 @@ To build the mobile application and run it natively on an andorid device, clone 
 ## Usability
 ### Interface
 In terms of the UI for the mobile application, a user can access available devices to pair to via BLE as well as the options for scheduling such as selecting channel schedules or enabling/disabling add detections, as well as options for controlling the hardware unit. The hardware options will be added in the near future. Below is some screenshots from an android device running the application with some of the relevant UI pages.
+
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240225_203002_AndroidApp%20(1).jpg" alt="Image Description" width="300">
 
 ### Navigation
@@ -90,11 +92,13 @@ Current navigation through the mobile application is very intuitive. The two dif
 
 ### Perception
 Changes within the mobile applications UI are indicated visually with either a popup window or by displaying the currently selected option. The below images depict the useage of popups to express changes/user prompts. 
+
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240414_214040_AndroidApp.jpg" alt="Image Description" width="300">
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240414_224245_AndroidApp.jpg" alt="Image Description" width="300">
 
 ### Responsiveness
 Currently the application has immediate response time in terms of navigation and selection options. When a user begins scanning for devices there is a required wait time to scan for devices. During this wait time a popup is displayed, notifiying the user that a scan is in progress. This is currently set to 3 seconds to enable a thorough scanning of nearby devices for connection. Connecting to a hardware module sucessfully over bluetooth shows a notification that the connection was sucessful, in the case where it is not, it states so. Below is a screenshot from the mobile application showing some of the mentioned UI elements. In term's of the text classification model, transcription, sentence splitting, tokenizing, finding sentence embeddings, predicting the sentences, and then sending back predictions will all play into the amount of time that it takes for the model to send predictions.
+
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240225_203023_AndroidApp.jpg" alt="Image Description" width="300">
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240225_203009_AndroidApp.jpg" alt="Image Description" width="300">
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240324_220549_AndroidApp.jpg" alt="Image Description" width="300">
@@ -108,6 +112,7 @@ The number of sentences used in training and testing the ad detection text class
 
 ### Aesthetic Rigor
 The remote can be tested through the Arduino IDE. Assets, in terms of text and images are accessible. In terms of the mobile application, a uniform aesthetic has been selected to keep the UI clear and concise (refer to the images in the Useability section). At the moment some of the popup's are not completely consistent with the total aesthetic (differing in color, size, or shape), and we plan to address this once development of other features has progressed more. For instance,  in the image below, the popup does not match the other colors associated with the app.
+
 <img src="https://github.com/Emmett-Kogan/TVMaestro/blob/master/docs/Screenshot_20240225_203009_AndroidApp.jpg" alt="Image Description" width="300">
 
 ## Vertical Features
