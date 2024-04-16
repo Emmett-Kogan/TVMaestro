@@ -1,5 +1,4 @@
 #include "../libraries/signal.h"
-#include <vector>
 #include <stdlib.h>
 #include <string.h>
 #include <pico/i2c_slave.h>
@@ -22,7 +21,7 @@
 #define BTN_PIN 13
 
 // Flash defines
-#define FLASH_TARGET_OFFSET (256 * 1024)
+#define FLASH_TARGET_OFFSET (1024 * 1024)
 #define FLASH_TARGET_CONTENTS ((const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET))
 
 // Global data structure defines
@@ -67,6 +66,7 @@ static void i2c_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
 }
 
 static void button_handler(uint gpio, uint32_t events) {
+    printf("Button pressed\n");
     gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, false);
     change_channel_flag = 1;
 }
@@ -95,19 +95,21 @@ int main() {
     copy_config_from_flash();
 
     while(1) {
-        while(!i2c_flag && !change_channel) {
+        while(!i2c_flag && !change_channel_flag) {
             sleep_ms(50); // I have no idea why but this makes a difference
         }
 
         // Handle case for button press
         if (change_channel_flag) {
             // Change the channel
+            printf("Interrupt from ML/Button generated\n");
+            
             change_channel(schedule[(*current_channel) + 1 % (*channel_count)]);
             *current_channel = ((*current_channel)+1) % (*channel_count);     
 
-            // Debaounce and cleanup
-            gpio_set_irq_enabled(BTN_PIN, GPIO_IRQ_EDGE_RISE, true);
+            // Debounce and cleanup
             sleep_ms(100);
+            gpio_set_irq_enabled_with_callback(BTN_PIN, GPIO_IRQ_EDGE_RISE, true, &button_handler);
             change_channel_flag = 0;
             continue;
         }
@@ -195,7 +197,9 @@ int main() {
 
                 break;
             default:
-                printf("Error: Invalid command");
+                memset(i2c_buffer, 0, 512);
+                printf("Error: Invalid command\n");
+                break;
         }
 
         // Reset buffer index and flag so we wait for the interrupt to be triggered again
@@ -206,20 +210,21 @@ int main() {
 
 // Every time either the calibration or scheudle changes, write them to flash
 void copy_config_to_flash(void) {
-    flash_range_erase(FLASH_TARGET_OFFSET, GDSB_SIZE);
+    printf("Copy config to flash called\n");
+
+    flash_range_erase(FLASH_TARGET_OFFSET, 5*FLASH_SECTOR_SIZE);
     flash_range_program(FLASH_TARGET_OFFSET, global_data_structures_buffer, GDSB_SIZE);
 }
 
 // On power up, load the existing calibration or schedule from flash if present
 void copy_config_from_flash(void) {
+    printf("Copy config from flash called\n");
     for (int i = 0; i < GDSB_SIZE; i++)
-        global_data_structures_buffer[i] = FLASH_TARGET_CONTENTS[i];
+        global_data_structures_buffer[i] = FLASH_TARGET_CONTENTS[i];    
 }
 
 // Will only handle the signal calls to change the channel
 void change_channel(uint32_t channel) {
     printf("Change channel called!\n");
-
-
     return;
 }

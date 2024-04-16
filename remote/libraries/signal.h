@@ -8,7 +8,7 @@
 // Defines
 #define SIGNAL_SIZE 200
 #define CONVERT (3.3f / (1<<12))
-#define BUFFER_SIZE 16000
+#define BUFFER_SIZE 32000
 #define THRESHHOLD 2.0
 
 // Feather pins (silkscreen labels)
