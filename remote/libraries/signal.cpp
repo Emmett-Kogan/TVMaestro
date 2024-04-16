@@ -10,6 +10,13 @@ void signal_init(void) {
     // GPIO init
     gpio_init(SIGNAL_PIN);
     gpio_set_dir(SIGNAL_PIN, GPIO_OUT);
+
+    // Overdrive mode on GPIO pin (note that this increases power consumption)
+    gpio_set_function(SIGNAL_PIN, GPIO_FUNC_SIO);
+    gpio_set_slew_rate(SIGNAL_PIN, GPIO_SLEW_RATE_FAST);
+    gpio_set_drive_strength(SIGNAL_PIN, GPIO_DRIVE_STRENGTH_12MA);
+    gpio_set_input_enabled(SIGNAL_PIN, false);
+
     gpio_put(SIGNAL_PIN, 1);
     return;
 }

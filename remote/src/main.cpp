@@ -137,8 +137,10 @@ int main() {
                 // Play a signal
                 if (!buttons[button].last)
                     printf("Error: button signal has not been recorded");
-                else
-                    play_signal(&buttons[button]);
+                else {
+                    for (int i = 0; i < 3; i++)
+                        play_signal(&buttons[button]);
+                }
                 break;
             case 'd':
                 // Display a signal
